@@ -400,7 +400,7 @@ end
 function nonoya:Window(GuiConfig)
     GuiConfig              = GuiConfig or {}
     GuiConfig.Title       = GuiConfig.Title or "nonoya"
-    GuiConfig.Footer      = GuiConfig.Footer or "Chloee :3"
+    GuiConfig.Footer      = GuiConfig.Footer or "nonoya"
     GuiConfig.Color       = GuiConfig.Color or Color3.fromRGB(255, 0, 255)
     GuiConfig.Version     = GuiConfig.Version or 1
     GuiConfig.ToggleText  = GuiConfig.ToggleText or "NN"
@@ -410,7 +410,7 @@ function nonoya:Window(GuiConfig)
 
     local GuiFunc = {}
 
-    local Chloeex = Instance.new("ScreenGui");
+    local Nonoyaa = Instance.new("ScreenGui");
     local DropShadowHolder = Instance.new("Frame");
     local Main = Instance.new("Frame");
     local UICorner = Instance.new("UICorner");
@@ -430,10 +430,10 @@ function nonoya:Window(GuiConfig)
     local LayersFolder = Instance.new("Folder");
     local LayersPageLayout = Instance.new("UIPageLayout");
 
-    Chloeex.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    Chloeex.Name = "Chloeex"
-    Chloeex.ResetOnSpawn = false
-    Chloeex.Parent = game:GetService("CoreGui")
+    Nonoyaa.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    Nonoyaa.Name = "Nonoyaa"
+    Nonoyaa.ResetOnSpawn = false
+    Nonoyaa.Parent = game:GetService("CoreGui")
 
     DropShadowHolder.BackgroundTransparency = 1
     DropShadowHolder.BorderSizePixel = 0
@@ -443,7 +443,7 @@ function nonoya:Window(GuiConfig)
     DropShadowHolder.Position = UDim2.new(isMobile and 0.05 or 0.2, 0, isMobile and 0.12 or 0.15, 0)
     DropShadowHolder.ZIndex = 0
     DropShadowHolder.Name = "DropShadowHolder"
-    DropShadowHolder.Parent = Chloeex
+    DropShadowHolder.Parent = Nonoyaa
 
     Main.BackgroundColor3 = Color3.fromRGB(18, 22, 30)
     Main.BackgroundTransparency = 0
@@ -692,8 +692,8 @@ function nonoya:Window(GuiConfig)
     ScrollTab.ChildRemoved:Connect(UpdateSize1)
 
     function GuiFunc:DestroyGui()
-        if CoreGui:FindFirstChild("Chloeex") then
-            Chloeex:Destroy()
+        if CoreGui:FindFirstChild("Nonoyaa") then
+            Nonoyaa:Destroy()
         end
     end
 
@@ -756,6 +756,7 @@ function nonoya:Window(GuiConfig)
         Label.Text = GuiConfig.ToggleText
         Label.TextColor3 = GuiConfig.Color
         Label.TextScaled = true
+        Label.TextXAlignment = Enum.TextXAlignment.Center
 
         local Button = Instance.new("TextButton")
         Button.Parent = MainButton
