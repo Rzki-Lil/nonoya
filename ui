@@ -2375,6 +2375,7 @@ function nonoya:Window(GuiConfig)
                 local DropdownContainer = Instance.new("Frame")
                 DropdownContainer.Size = UDim2.new(1, 0, 1, 0)
                 DropdownContainer.BackgroundTransparency = 1
+                DropdownContainer.LayoutOrder = CountDropdown
                 DropdownContainer.Parent = DropdownFolder
 
                 local SearchBox = Instance.new("TextBox")
