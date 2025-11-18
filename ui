@@ -1,18 +1,18 @@
 local HttpService = game:GetService("HttpService")
 local TweenService = game:GetService("TweenService")
 
-if not isfolder("Bored") then
-    makefolder("Bored")
+if not isfolder("nonoya") then
+    makefolder("nonoya")
 end
-if not isfolder("Bored/Config") then
-    makefolder("Bored/Config")
+if not isfolder("nonoya/Config") then
+    makefolder("nonoya/Config")
 end
 
 local gameName   = tostring(game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name)
 gameName         = gameName:gsub("[^%w_ ]", "")
 gameName         = gameName:gsub("%s+", "_")
 
-local ConfigFile = "Bored/Config/Bored_" .. gameName .. ".json"
+local ConfigFile = "nonoya/Config/nonoya_" .. gameName .. ".json"
 
 ConfigData       = {}
 Elements         = {}
@@ -220,10 +220,10 @@ function CircleClick()
     -- intentionally left blank to keep interactions snappy without extra effects
 end
 
-local Bored = {}
-function Bored:MakeNotify(NotifyConfig)
+local nonoya = {}
+function nonoya:MakeNotify(NotifyConfig)
     local NotifyConfig = NotifyConfig or {}
-    NotifyConfig.Title = NotifyConfig.Title or "Bored"
+    NotifyConfig.Title = NotifyConfig.Title or "nonoya"
     NotifyConfig.Description = NotifyConfig.Description or "Notification"
     NotifyConfig.Content = NotifyConfig.Content or "Content"
     NotifyConfig.Color = NotifyConfig.Color or Color3.fromRGB(255, 0, 255)
@@ -387,19 +387,19 @@ function Bored:MakeNotify(NotifyConfig)
     return NotifyFunction
 end
 
-function BORED(msg, delay, color, title, desc)
-    return Bored:MakeNotify({
-        Title = title or "Bored",
+function NONOYA(msg, delay, color, title, desc)
+    return nonoya:MakeNotify({
+        Title = title or "nonoya",
         Description = desc or "Notification",
         Content = msg or "Content",
-        Color = color or Color3.fromRGB(0, 208, 255),
+        Color = color or Color3.fromRGB(204, 75, 42),
         Delay = delay or 4
     })
 end
 
-function Bored:Window(GuiConfig)
+function nonoya:Window(GuiConfig)
     GuiConfig              = GuiConfig or {}
-    GuiConfig.Title       = GuiConfig.Title or "Bored"
+    GuiConfig.Title       = GuiConfig.Title or "nonoya"
     GuiConfig.Footer      = GuiConfig.Footer or "Chloee :3"
     GuiConfig.Color       = GuiConfig.Color or Color3.fromRGB(255, 0, 255)
     GuiConfig.Version     = GuiConfig.Version or 1
@@ -2663,4 +2663,4 @@ function Bored:Window(GuiConfig)
     return Tabs
 end
 
-return Bored
+return nonoya
