@@ -861,7 +861,6 @@ function nonoya:Window(GuiConfig)
     local UIStroke14 = Instance.new("UIStroke");
     local DropdownSelectReal = Instance.new("Frame");
     local DropdownFolder = Instance.new("Folder");
-    local DropPageLayout = Instance.new("UIPageLayout");
     local DropdownUIScale = Instance.new("UIScale")
 
     DropdownSelect.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -902,21 +901,22 @@ function nonoya:Window(GuiConfig)
     DropdownFolder.Name = "DropdownFolder"
     DropdownFolder.Parent = DropdownSelectReal
 
-    DropPageLayout.EasingDirection = Enum.EasingDirection.InOut
-    DropPageLayout.EasingStyle = Enum.EasingStyle.Quad
-    DropPageLayout.TweenTime = 0.25
-    DropPageLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    DropPageLayout.FillDirection = Enum.FillDirection.Vertical
-    DropPageLayout.Archivable = false
-    DropPageLayout.Name = "DropPageLayout"
-    DropPageLayout.Parent = DropdownFolder
-
     local defaultArrowColor = Color3.fromRGB(230, 230, 230)
     local dropdownOpen = false
     local dropdownBlurTween
     local dropdownScaleTween
     local activeDropdownArrow
     local arrowTweens = {}
+    local activeDropdownContainer
+    local function setActiveDropdownContainer(container)
+        if activeDropdownContainer and activeDropdownContainer ~= container then
+            activeDropdownContainer.Visible = false
+        end
+        activeDropdownContainer = container
+        if activeDropdownContainer then
+            activeDropdownContainer.Visible = true
+        end
+    end
     local overlayShowTime = 0.25
     local overlayHideTime = 0.2
     local overlayShowInfo = TweenInfo.new(overlayShowTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
@@ -959,6 +959,7 @@ function nonoya:Window(GuiConfig)
             animateArrowState(activeDropdownArrow, false)
             activeDropdownArrow = nil
         end
+        setActiveDropdownContainer(nil)
         if not MoreBlur.Visible then
             dropdownOpen = false
             return
@@ -978,7 +979,7 @@ function nonoya:Window(GuiConfig)
         end)
     end
 
-    local function openDropdownOverlay(pageIndex, arrowLabel)
+    local function openDropdownOverlay(container, arrowLabel)
         if activeDropdownArrow and activeDropdownArrow ~= arrowLabel then
             animateArrowState(activeDropdownArrow, false)
         end
@@ -986,6 +987,7 @@ function nonoya:Window(GuiConfig)
         if activeDropdownArrow then
             animateArrowState(activeDropdownArrow, true)
         end
+        setActiveDropdownContainer(container)
         dropdownOpen = true
         UpdateDropdownSize()
         MoreBlur.Visible = true
@@ -998,16 +1000,12 @@ function nonoya:Window(GuiConfig)
         dropdownScaleTween = TweenService:Create(DropdownUIScale, dropdownScaleShowInfo, { Scale = 1 })
         dropdownBlurTween:Play()
         dropdownScaleTween:Play()
-        if typeof(pageIndex) == "number" then
-            DropPageLayout:JumpToIndex(pageIndex)
-        end
     end
 
     ConnectButton.Activated:Connect(closeDropdownOverlay)
     --// Tabs
     local Tabs = {}
     local CountTab = 0
-    local CountDropdown = 0
     local ActiveTab = nil
     function Tabs:AddTab(TabConfig)
         local TabConfig = TabConfig or {}
@@ -2338,15 +2336,11 @@ function nonoya:Window(GuiConfig)
                 SelectOptionsFrame.Position = UDim2.new(1, -7, 0.5, 0)
                 SelectOptionsFrame.Size = UDim2.new(0, 148, 0, 30)
                 SelectOptionsFrame.Name = "SelectOptionsFrame"
-                SelectOptionsFrame.LayoutOrder = CountDropdown
                 SelectOptionsFrame.Parent = Dropdown
 
                 UICorner11.CornerRadius = UDim.new(0, 4)
                 UICorner11.Parent = SelectOptionsFrame
 
-                DropdownButton.Activated:Connect(function()
-                    openDropdownOverlay(SelectOptionsFrame.LayoutOrder, OptionArrow)
-                end)
 
                 OptionSelecting.Font = Enum.Font.GothamBold
                 OptionSelecting.Text = DropdownConfig.Multi and "Select Options" or "Select Option"
@@ -2375,8 +2369,12 @@ function nonoya:Window(GuiConfig)
                 local DropdownContainer = Instance.new("Frame")
                 DropdownContainer.Size = UDim2.new(1, 0, 1, 0)
                 DropdownContainer.BackgroundTransparency = 1
-                DropdownContainer.LayoutOrder = CountDropdown
+                DropdownContainer.Visible = false
                 DropdownContainer.Parent = DropdownFolder
+
+                DropdownButton.Activated:Connect(function()
+                    openDropdownOverlay(DropdownContainer, OptionArrow)
+                end)
 
                 local SearchBox = Instance.new("TextBox")
                 SearchBox.PlaceholderText = "Search"
@@ -2584,7 +2582,6 @@ function nonoya:Window(GuiConfig)
                 DropdownFunc:SetValues(DropdownFunc.Options, DropdownFunc.Value)
 
                 CountItem = CountItem + 1
-                CountDropdown = CountDropdown + 1
                 Elements[configKey] = DropdownFunc
                 return DropdownFunc
             end
