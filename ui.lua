@@ -412,11 +412,19 @@ function nonoya:Window(GuiConfig)
     GuiConfig.Color       = GuiConfig.Color or Color3.fromRGB(255, 0, 255)
     GuiConfig.Version     = GuiConfig.Version or 1
     GuiConfig.ToggleText  = GuiConfig.ToggleText or "NN"
+    GuiConfig.TabWidth    = GuiConfig.TabWidth or 180
+    GuiConfig.MainTransparency = GuiConfig.MainTransparency or 0
+    GuiConfig.TabTransparency = GuiConfig.TabTransparency or 0
+    GuiConfig.ContentTransparency = GuiConfig.ContentTransparency or 0
+    GuiConfig.Size = GuiConfig.Size or nil
+    GuiConfig.Width = GuiConfig.Width or nil
+    GuiConfig.Height = GuiConfig.Height or nil
 
     CURRENT_VERSION        = GuiConfig.Version
     LoadConfigFromFile()
 
     local GuiFunc = {}
+    local toggleElements = {}
 
     local Nonoyaa = Instance.new("ScreenGui");
     local DropShadowHolder = Instance.new("Frame");
@@ -446,13 +454,24 @@ function nonoya:Window(GuiConfig)
     DropShadowHolder.BackgroundTransparency = 1
     DropShadowHolder.BorderSizePixel = 0
     local winWidth, winHeight = getWindowDimensions()
+    if GuiConfig.Size then
+        if typeof(GuiConfig.Size) == "Vector2" then
+            winWidth = GuiConfig.Size.X
+            winHeight = GuiConfig.Size.Y
+        elseif type(GuiConfig.Size) == "table" then
+            winWidth = GuiConfig.Size.x or GuiConfig.Size[1] or winWidth
+            winHeight = GuiConfig.Size.y or GuiConfig.Size[2] or winHeight
+        end
+    end
+    if GuiConfig.Width then winWidth = GuiConfig.Width end
+    if GuiConfig.Height then winHeight = GuiConfig.Height end
     DropShadowHolder.Size = UDim2.new(0, winWidth, 0, winHeight)
     DropShadowHolder.ZIndex = 0
     DropShadowHolder.Name = "DropShadowHolder"
     DropShadowHolder.Parent = Nonoyaa
 
     Main.BackgroundColor3 = Color3.fromRGB(18, 22, 30)
-    Main.BackgroundTransparency = 0
+    Main.BackgroundTransparency = GuiConfig.MainTransparency
     Main.AnchorPoint = Vector2.new(0, 0)
     Main.BorderSizePixel = 0
     Main.Position = UDim2.new(0, 0, 0, 0)
@@ -601,11 +620,16 @@ function nonoya:Window(GuiConfig)
     CloseConfirmNo.Name = "CloseConfirmNo"
     CloseConfirmNo.Parent = CloseConfirm
 
+    local tabWidth = GuiConfig.TabWidth
+    local leftMargin = 12
+    local gapBetween = 15
+    local rightMargin = 12
+
     LayersTab.BackgroundColor3 = Color3.fromRGB(24, 28, 39)
-    LayersTab.BackgroundTransparency = 0
+    LayersTab.BackgroundTransparency = GuiConfig.TabTransparency
     LayersTab.BorderSizePixel = 0
-    LayersTab.Position = UDim2.new(0, 12, 0, 61)
-    LayersTab.Size = UDim2.new(0, 180, 1, -73)
+    LayersTab.Position = UDim2.new(0, leftMargin, 0, 61)
+    LayersTab.Size = UDim2.new(0, tabWidth, 1, -73)
     LayersTab.Name = "LayersTab"
     LayersTab.Parent = Main
 
@@ -616,16 +640,16 @@ function nonoya:Window(GuiConfig)
     DecideFrame.BackgroundColor3 = Color3.fromRGB(36, 42, 58)
     DecideFrame.BackgroundTransparency = 0
     DecideFrame.BorderSizePixel = 0
-    DecideFrame.Position = UDim2.new(0, 196, 0, 61)
+    DecideFrame.Position = UDim2.new(0, leftMargin + tabWidth + 4, 0, 61)
     DecideFrame.Size = UDim2.new(0, 1, 1, -73)
     DecideFrame.Name = "DecideFrame"
     DecideFrame.Parent = Main
 
     Layers.BackgroundColor3 = Color3.fromRGB(20, 24, 35)
-    Layers.BackgroundTransparency = 0
+    Layers.BackgroundTransparency = GuiConfig.ContentTransparency
     Layers.BorderSizePixel = 0
-    Layers.Position = UDim2.new(0, 207, 0, 61)
-    Layers.Size = UDim2.new(1, -219, 1, -73)
+    Layers.Position = UDim2.new(0, leftMargin + tabWidth + gapBetween, 0, 61)
+    Layers.Size = UDim2.new(1, -(tabWidth + leftMargin + gapBetween + rightMargin), 1, -73)
     Layers.Name = "Layers"
     Layers.Parent = Main
 
@@ -703,8 +727,17 @@ function nonoya:Window(GuiConfig)
         end
     end
 
+    local function resetTogglesWithoutSaving()
+        for _, toggle in pairs(toggleElements) do
+            if toggle and toggle.Set then
+                toggle:Set(false, true)
+            end
+        end
+    end
+
     local function closeWindow()
         CloseConfirm.Visible = false
+        resetTogglesWithoutSaving()
         GuiFunc:DestroyGui()
         local toggleUi = game.CoreGui:FindFirstChild("ToggleUIButton")
         if toggleUi then
@@ -1732,7 +1765,7 @@ function nonoya:Window(GuiConfig)
                 ToggleTitle.TextYAlignment = Enum.TextYAlignment.Top
                 ToggleTitle.BackgroundTransparency = 1
                 ToggleTitle.Position = UDim2.new(0, 10, 0, 10)
-                ToggleTitle.Size = UDim2.new(1, -100, 0, 13)
+                ToggleTitle.Size = UDim2.new(1, -140, 0, 13)
                 ToggleTitle.Name = "ToggleTitle"
                 ToggleTitle.Parent = Toggle
 
@@ -1745,7 +1778,7 @@ function nonoya:Window(GuiConfig)
                 ToggleTitle2.TextYAlignment = Enum.TextYAlignment.Top
                 ToggleTitle2.BackgroundTransparency = 1
                 ToggleTitle2.Position = UDim2.new(0, 10, 0, 23)
-                ToggleTitle2.Size = UDim2.new(1, -100, 0, 12)
+                ToggleTitle2.Size = UDim2.new(1, -140, 0, 12)
                 ToggleTitle2.Name = "ToggleTitle2"
                 ToggleTitle2.Parent = Toggle
 
@@ -1755,41 +1788,31 @@ function nonoya:Window(GuiConfig)
                 ToggleContent.TextSize = 12
                 ToggleContent.TextTransparency = 0.6
                 ToggleContent.TextXAlignment = Enum.TextXAlignment.Left
-                ToggleContent.TextYAlignment = Enum.TextYAlignment.Bottom
+                ToggleContent.TextYAlignment = Enum.TextYAlignment.Top
                 ToggleContent.BackgroundTransparency = 1
-                ToggleContent.Size = UDim2.new(1, -100, 0, 12)
+                ToggleContent.Size = UDim2.new(1, -140, 0, 0)
+                ToggleContent.AutomaticSize = Enum.AutomaticSize.Y
+                ToggleContent.TextWrapped = true
                 ToggleContent.Name = "ToggleContent"
                 ToggleContent.Parent = Toggle
 
                 if ToggleConfig.Title2 ~= "" then
-                    Toggle.Size = UDim2.new(1, 0, 0, 57)
-                    ToggleContent.Position = UDim2.new(0, 10, 0, 36)
                     ToggleTitle2.Visible = true
+                    ToggleContent.Position = UDim2.new(0, 10, 0, 36)
                 else
-                    Toggle.Size = UDim2.new(1, 0, 0, 46)
-                    ToggleContent.Position = UDim2.new(0, 10, 0, 23)
                     ToggleTitle2.Visible = false
-                end
-                local lines = math.floor(ToggleContent.TextBounds.X / ToggleContent.AbsoluteSize.X)
-
-                ToggleContent.Size = UDim2.new(1, -100, 0, 12 + (12 * lines))
-                ToggleContent.TextWrapped = true
-                if ToggleConfig.Title2 ~= "" then
-                    Toggle.Size = UDim2.new(1, 0, 0, ToggleContent.AbsoluteSize.Y + 47)
-                else
-                    Toggle.Size = UDim2.new(1, 0, 0, ToggleContent.AbsoluteSize.Y + 33)
+                    ToggleContent.Position = UDim2.new(0, 10, 0, 23)
                 end
 
+                local function updateToggleHeight()
+                    local contentHeight = math.max(ToggleContent.AbsoluteSize.Y, 12)
+                    local baseHeight = ToggleConfig.Title2 ~= "" and 47 or 33
+                    Toggle.Size = UDim2.new(1, 0, 0, baseHeight + contentHeight)
+                end
+                updateToggleHeight()
                 ToggleContent:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-                    ToggleContent.TextWrapped = false
-                    ToggleContent.Size = ToggleContent.Size == UDim2.new(1, -100, 0, 12 + (12 * lines))
-                    if ToggleConfig.Title2 ~= "" then
-                        Toggle.Size = UDim2.new(1, 0, 0, ToggleContent.AbsoluteSize.Y + 47)
-                    else
-                        Toggle.Size = UDim2.new(1, 0, 0, ToggleContent.AbsoluteSize.Y + 33)
-                    end
-                    ToggleContent.TextWrapped = true
-                    UpdateSizeSection(true)
+                    updateToggleHeight()
+                    UpdateSizeSection()
                 end)
 
                 ToggleButton.Font = Enum.Font.SourceSans
@@ -1828,15 +1851,17 @@ function nonoya:Window(GuiConfig)
                     ToggleFunc:Set(ToggleFunc.Value)
                 end)
 
-                function ToggleFunc:Set(Value)
+                function ToggleFunc:Set(Value, skipSave)
                     if typeof(ToggleConfig.Callback) == "function" then
                         local ok, err = pcall(function()
                             ToggleConfig.Callback(Value)
                         end)
                         if not ok then warn("Toggle Callback error:", err) end
                     end
-                    ConfigData[configKey] = Value
-                    SaveConfig()
+                    if not skipSave then
+                        ConfigData[configKey] = Value
+                        SaveConfig()
+                    end
                     if Value then
                         ToggleTitle.TextColor3 = GuiConfig.Color
                         ToggleCircle.Position = UDim2.new(0, 15, 0, 0)
@@ -1857,6 +1882,7 @@ function nonoya:Window(GuiConfig)
                 ToggleFunc:Set(ToggleFunc.Value)
                 CountItem = CountItem + 1
                 Elements[configKey] = ToggleFunc
+                toggleElements[configKey] = ToggleFunc
                 return ToggleFunc
             end
 
@@ -1946,7 +1972,7 @@ function nonoya:Window(GuiConfig)
                     SliderContent.Size = UDim2.new(1, -180, 0, 12 + (12 * lines))
                     Slider.Size = UDim2.new(1, 0, 0, SliderContent.AbsoluteSize.Y + 33)
                     SliderContent.TextWrapped = true
-                    UpdateSizeSection(true)
+                    UpdateSizeSection()
                 end)
 
                 SliderInput.AnchorPoint = Vector2.new(0, 0.5)
@@ -2156,7 +2182,7 @@ function nonoya:Window(GuiConfig)
                     InputContent.Size = UDim2.new(1, -180, 0, 12 + (12 * lines))
                     Input.Size = UDim2.new(1, 0, 0, InputContent.AbsoluteSize.Y + 33)
                     InputContent.TextWrapped = true
-                    UpdateSizeSection(true)
+                    UpdateSizeSection()
                 end)
 
                 InputFrame.AnchorPoint = Vector2.new(1, 0.5)
