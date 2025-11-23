@@ -395,7 +395,7 @@ function nonoya:MakeNotify(NotifyConfig)
     return NotifyFunction
 end
 
-function NONOYA(msg, delay, color, title, desc)
+function nonoyaNotify(msg, delay, color, title, desc)
     return nonoya:MakeNotify({
         Title = title or "nonoya",
         Description = desc or "Notification",
@@ -605,27 +605,27 @@ function nonoya:Window(GuiConfig)
     LayersTab.BackgroundTransparency = 0
     LayersTab.BorderSizePixel = 0
     LayersTab.Position = UDim2.new(0, 12, 0, 61)
-    LayersTab.Size = UDim2.new(1, -24, 0, 41)
+    LayersTab.Size = UDim2.new(0, 180, 1, -73)
     LayersTab.Name = "LayersTab"
     LayersTab.Parent = Main
 
     UICorner2.CornerRadius = UDim.new(0, 2)
     UICorner2.Parent = LayersTab
 
-    DecideFrame.AnchorPoint = Vector2.new(0.5, 0)
+    DecideFrame.AnchorPoint = Vector2.new(0, 0)
     DecideFrame.BackgroundColor3 = Color3.fromRGB(36, 42, 58)
     DecideFrame.BackgroundTransparency = 0
     DecideFrame.BorderSizePixel = 0
-    DecideFrame.Position = UDim2.new(0.5, 0, 0, 96)
-    DecideFrame.Size = UDim2.new(1, -24, 0, 1)
+    DecideFrame.Position = UDim2.new(0, 196, 0, 61)
+    DecideFrame.Size = UDim2.new(0, 1, 1, -73)
     DecideFrame.Name = "DecideFrame"
     DecideFrame.Parent = Main
 
     Layers.BackgroundColor3 = Color3.fromRGB(20, 24, 35)
     Layers.BackgroundTransparency = 0
     Layers.BorderSizePixel = 0
-    Layers.Position = UDim2.new(0, 12, 0, 104)
-    Layers.Size = UDim2.new(1, -24, 1, -116)
+    Layers.Position = UDim2.new(0, 207, 0, 61)
+    Layers.Size = UDim2.new(1, -219, 1, -73)
     Layers.Name = "Layers"
     Layers.Parent = Main
 
@@ -637,13 +637,13 @@ function nonoya:Window(GuiConfig)
     NameTab.TextColor3 = Color3.fromRGB(240, 240, 240)
     NameTab.TextSize = 20
     NameTab.TextWrapped = true
-    NameTab.TextXAlignment = Enum.TextXAlignment.Center
+    NameTab.TextXAlignment = Enum.TextXAlignment.Left
     NameTab.TextYAlignment = Enum.TextYAlignment.Center
     NameTab.BackgroundTransparency = 1
     NameTab.BorderSizePixel = 0
-    NameTab.Size = UDim2.new(1, 0, 0, 32)
-    NameTab.AnchorPoint = Vector2.new(0.5, 0)
-    NameTab.Position = UDim2.new(0.5, 0, 0, 0)
+    NameTab.Size = UDim2.new(1, -24, 0, 32)
+    NameTab.AnchorPoint = Vector2.new(0, 0)
+    NameTab.Position = UDim2.new(0, 12, 0, 0)
     NameTab.Name = "NameTab"
     NameTab.Parent = Layers
 
@@ -662,9 +662,9 @@ function nonoya:Window(GuiConfig)
     LayersPageLayout.SortOrder = Enum.SortOrder.LayoutOrder
     LayersPageLayout.Name = "LayersPageLayout"
     LayersPageLayout.Parent = LayersFolder
-    LayersPageLayout.TweenTime = 0.5
+    LayersPageLayout.TweenTime = 0
     LayersPageLayout.EasingDirection = Enum.EasingDirection.InOut
-    LayersPageLayout.EasingStyle = Enum.EasingStyle.Quad
+    LayersPageLayout.EasingStyle = Enum.EasingStyle.Linear
 
     local ScrollTab = Instance.new("ScrollingFrame");
     local UIListLayout = Instance.new("UIListLayout");
@@ -672,7 +672,7 @@ function nonoya:Window(GuiConfig)
     ScrollTab.CanvasSize = UDim2.new(0, 0, 0, 0)
     ScrollTab.ScrollBarImageColor3 = GuiConfig.Color
     ScrollTab.ScrollBarThickness = 5
-    ScrollTab.ScrollingDirection = Enum.ScrollingDirection.X
+    ScrollTab.ScrollingDirection = Enum.ScrollingDirection.Y
     ScrollTab.Active = true
     ScrollTab.BackgroundTransparency = 1
     ScrollTab.BorderSizePixel = 0
@@ -682,17 +682,17 @@ function nonoya:Window(GuiConfig)
 
     UIListLayout.Padding = UDim.new(0, 8)
     UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+    UIListLayout.FillDirection = Enum.FillDirection.Vertical
     UIListLayout.Parent = ScrollTab
 
     local function UpdateSize1()
-        local OffsetX = 0
+        local offsetY = 0
         for _, child in ScrollTab:GetChildren() do
             if child:IsA("Frame") and child.Name == "Tab" then
-                OffsetX = OffsetX + child.Size.X.Offset + 8
+                offsetY = offsetY + child.Size.Y.Offset + 8
             end
         end
-        ScrollTab.CanvasSize = UDim2.new(0, math.max(0, OffsetX), 0, 0)
+        ScrollTab.CanvasSize = UDim2.new(0, 0, 0, math.max(0, offsetY))
     end
     ScrollTab.ChildAdded:Connect(UpdateSize1)
     ScrollTab.ChildRemoved:Connect(UpdateSize1)
@@ -1057,7 +1057,7 @@ function nonoya:Window(GuiConfig)
         Tab.BackgroundTransparency = CountTab == 0 and 0.08 or 0.55
         Tab.BorderSizePixel = 0
         Tab.LayoutOrder = CountTab
-        Tab.Size = UDim2.new(0, 150, 1, 0)
+        Tab.Size = UDim2.new(1, 0, 0, 42)
         Tab.Name = "Tab"
         Tab.Parent = ScrollTab
 
@@ -1078,13 +1078,13 @@ function nonoya:Window(GuiConfig)
         TabName.Text = tostring(TabConfig.Name)
         TabName.TextColor3 = CountTab == 0 and Color3.fromRGB(245, 245, 245) or Color3.fromRGB(180, 186, 202)
         TabName.TextSize = 13
-        TabName.TextXAlignment = Enum.TextXAlignment.Center
+        TabName.TextXAlignment = Enum.TextXAlignment.Left
         TabName.TextYAlignment = Enum.TextYAlignment.Center
         TabName.BackgroundTransparency = 1
         TabName.BorderSizePixel = 0
-        TabName.AnchorPoint = Vector2.new(0.5, 0.5)
-        TabName.Position = UDim2.new(0.5, 0, 0.5, 0)
-        TabName.Size = UDim2.new(1, -20, 1, -6)
+        TabName.AnchorPoint = Vector2.new(0, 0.5)
+        TabName.Position = UDim2.new(0, 12, 0.5, 0)
+        TabName.Size = UDim2.new(1, -24, 1, -8)
         TabName.Name = "TabName"
         TabName.Parent = Tab
 
@@ -1104,15 +1104,15 @@ function nonoya:Window(GuiConfig)
 
         if IconLabel.Visible then
             TabName.AnchorPoint = Vector2.new(0, 0.5)
-            TabName.Position = UDim2.new(0, 38, 0.5, 0)
-            TabName.Size = UDim2.new(1, -50, 1, -6)
+            TabName.Position = UDim2.new(0, 40, 0.5, 0)
+            TabName.Size = UDim2.new(1, -52, 1, -8)
             TabName.TextXAlignment = Enum.TextXAlignment.Left
         end
 
         TabIndicator.BackgroundColor3 = GuiConfig.Color
         TabIndicator.BorderSizePixel = 0
-        TabIndicator.Size = UDim2.new(1, 0, 0, 2)
-        TabIndicator.Position = UDim2.new(0, 0, 1, 0)
+        TabIndicator.Size = UDim2.new(0, 3, 1, 0)
+        TabIndicator.Position = UDim2.new(0, 0, 0, 0)
         TabIndicator.Name = "TabIndicator"
         TabIndicator.Visible = CountTab == 0
         TabIndicator.Parent = Tab
@@ -1157,8 +1157,6 @@ function nonoya:Window(GuiConfig)
             local Title = Title or "Title"
             local Section = Instance.new("Frame");
             local SectionDecideFrame = Instance.new("Frame");
-            local UICorner1 = Instance.new("UICorner");
-            local UIGradient = Instance.new("UIGradient");
 
             Section.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             Section.BackgroundTransparency = 0.9990000128746033
@@ -1240,23 +1238,15 @@ function nonoya:Window(GuiConfig)
             SectionTitle.Name = "SectionTitle"
             SectionTitle.Parent = SectionReal
 
-            SectionDecideFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            SectionDecideFrame.BackgroundColor3 = Color3.fromRGB(70, 75, 86)
+            SectionDecideFrame.BackgroundTransparency = 0.35
             SectionDecideFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
             SectionDecideFrame.AnchorPoint = Vector2.new(0.5, 0)
             SectionDecideFrame.BorderSizePixel = 0
             SectionDecideFrame.Position = UDim2.new(0.5, 0, 0, 33)
-            SectionDecideFrame.Size = UDim2.new(0, 0, 0, 2)
+            SectionDecideFrame.Size = UDim2.new(0, 0, 0, 1)
             SectionDecideFrame.Name = "SectionDecideFrame"
             SectionDecideFrame.Parent = Section
-
-            UICorner1.Parent = SectionDecideFrame
-
-            UIGradient.Color = ColorSequence.new {
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 20)),
-                ColorSequenceKeypoint.new(0.5, GuiConfig.Color),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
-            }
-            UIGradient.Parent = SectionDecideFrame
 
             --// Section Add
             local SectionAdd = Instance.new("Frame");
@@ -1284,11 +1274,6 @@ function nonoya:Window(GuiConfig)
             UIListLayout2.Parent = SectionAdd
 
             local OpenSection = false
-            local sectionOpenTweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-            local sectionCloseTweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-            local sectionArrowTweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-            local sectionTween, sectionAddTween, sectionDividerTween, arrowTween
-            local sectionTweenConn
 
             local function UpdateSizeScroll()
                 local OffsetY = 0
@@ -1310,109 +1295,57 @@ function nonoya:Window(GuiConfig)
                 return SectionSizeYWitdh
             end
 
-            local function animateArrowState(instant)
+            local function animateArrowState()
                 if AlwaysOpen == true or not ArrowLabel or not ArrowLabel.Parent then
                     return
                 end
                 ArrowLabel.Text = ">"
                 local targetRotation = OpenSection and 90 or 0
                 local targetColor = OpenSection and GuiConfig.Color or Color3.fromRGB(220, 220, 220)
-                if instant then
-                    ArrowLabel.Rotation = targetRotation
-                    ArrowLabel.TextColor3 = targetColor
-                    return
-                end
-                if arrowTween then
-                    arrowTween:Cancel()
-                end
-                arrowTween = TweenService:Create(ArrowLabel, sectionArrowTweenInfo, {
-                    Rotation = targetRotation,
-                    TextColor3 = targetColor
-                })
-                arrowTween:Play()
+                ArrowLabel.Rotation = targetRotation
+                ArrowLabel.TextColor3 = targetColor
             end
 
-            local function UpdateSizeSection(instant)
-                instant = instant == true
+            local function UpdateSizeSection()
                 local sectionTargetHeight = OpenSection and getSectionContentHeight() or 30
                 local sectionAddHeight = math.max(0, sectionTargetHeight - 38)
-                local decideSize = OpenSection and UDim2.new(1, 0, 0, 2) or UDim2.new(0, 0, 0, 2)
+                local decideSize = OpenSection and UDim2.new(1, 0, 0, 1) or UDim2.new(0, 0, 0, 1)
 
-                if instant then
-                    Section.Size = UDim2.new(1, 1, 0, sectionTargetHeight)
-                    SectionAdd.Size = UDim2.new(1, 0, 0, OpenSection and sectionAddHeight or 0)
-                    SectionAdd.Visible = OpenSection
-                    SectionDecideFrame.Size = decideSize
-                    UpdateSizeScroll()
-                    animateArrowState(true)
-                    return
-                end
-
-                SectionAdd.Visible = true
-                local tweenInfo = OpenSection and sectionOpenTweenInfo or sectionCloseTweenInfo
-
-                if sectionTween then sectionTween:Cancel() end
-                if sectionAddTween then sectionAddTween:Cancel() end
-                if sectionDividerTween then sectionDividerTween:Cancel() end
-                if sectionTweenConn then
-                    sectionTweenConn:Disconnect()
-                    sectionTweenConn = nil
-                end
-
-                local targetState = OpenSection
-                sectionTween = TweenService:Create(Section, tweenInfo, {
-                    Size = UDim2.new(1, 1, 0, sectionTargetHeight)
-                })
-                sectionAddTween = TweenService:Create(SectionAdd, tweenInfo, {
-                    Size = UDim2.new(1, 0, 0, sectionAddHeight)
-                })
-                sectionDividerTween = TweenService:Create(SectionDecideFrame, tweenInfo, {
-                    Size = decideSize
-                })
-
-                sectionTweenConn = sectionTween.Completed:Connect(function(playbackState)
-                    if playbackState == Enum.PlaybackState.Completed then
-                        if not targetState and OpenSection == targetState then
-                            SectionAdd.Visible = false
-                            SectionAdd.Size = UDim2.new(1, 0, 0, 0)
-                        end
-                        UpdateSizeScroll()
-                    end
-                end)
-
-                sectionTween:Play()
-                sectionAddTween:Play()
-                sectionDividerTween:Play()
-                animateArrowState(false)
+                Section.Size = UDim2.new(1, 1, 0, sectionTargetHeight)
+                SectionAdd.Size = UDim2.new(1, 0, 0, OpenSection and sectionAddHeight or 0)
+                SectionAdd.Visible = OpenSection
+                SectionDecideFrame.Size = decideSize
+                UpdateSizeScroll()
+                animateArrowState()
             end
 
-            local function setSectionState(newState, instant)
+            local function setSectionState(newState)
                 OpenSection = newState
-                UpdateSizeSection(instant)
+                UpdateSizeSection()
             end
 
             if AlwaysOpen == true then
                 SectionButton:Destroy()
                 FeatureFrame:Destroy()
-                setSectionState(true, true)
+                setSectionState(true)
             elseif AlwaysOpen == false then
-                setSectionState(true, true)
+                setSectionState(true)
             else
-                setSectionState(false, true)
+                setSectionState(false)
             end
 
             if AlwaysOpen ~= true then
                 SectionButton.Activated:Connect(function()
                     CircleClick(SectionButton, Mouse.X, Mouse.Y)
-                    setSectionState(not OpenSection, false)
+                    setSectionState(not OpenSection)
                 end)
             end
 
             SectionAdd.ChildAdded:Connect(function()
-                UpdateSizeSection(true)
+                UpdateSizeSection()
             end)
             SectionAdd.ChildRemoved:Connect(function()
-                UpdateSizeSection(true)
+                UpdateSizeSection()
             end)
 
             local layout = ScrolLayers:FindFirstChildOfClass("UIListLayout")
@@ -2604,23 +2537,11 @@ function nonoya:Window(GuiConfig)
                 Divider.Parent = SectionAdd
                 Divider.AnchorPoint = Vector2.new(0.5, 0)
                 Divider.Position = UDim2.new(0.5, 0, 0, 0)
-                Divider.Size = UDim2.new(1, 0, 0, 2)
-                Divider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                Divider.BackgroundTransparency = 0
+                Divider.Size = UDim2.new(1, 0, 0, 1)
+                Divider.BackgroundColor3 = Color3.fromRGB(70, 75, 86)
+                Divider.BackgroundTransparency = 0.35
                 Divider.BorderSizePixel = 0
                 Divider.LayoutOrder = CountItem
-
-                local UIGradient = Instance.new("UIGradient")
-                UIGradient.Color = ColorSequence.new {
-                    ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 20)),
-                    ColorSequenceKeypoint.new(0.5, GuiConfig.Color),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
-                }
-                UIGradient.Parent = Divider
-
-                local UICorner = Instance.new("UICorner")
-                UICorner.CornerRadius = UDim.new(0, 2)
-                UICorner.Parent = Divider
 
                 CountItem = CountItem + 1
                 return Divider
