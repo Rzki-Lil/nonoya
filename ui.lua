@@ -955,11 +955,10 @@ function nonoya:Window(GuiConfig)
     DropdownSelectReal.ZIndex = 36
     DropdownSelectReal.Parent = DropdownSelect
 
-    DropdownCloseButton.BackgroundTransparency = 0.8
-    DropdownCloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    DropdownCloseButton.BackgroundTransparency = 1
     DropdownCloseButton.BorderSizePixel = 0
-    DropdownCloseButton.Size = UDim2.new(0, 26, 0, 26)
-    DropdownCloseButton.Position = UDim2.new(1, -34, 0, 12)
+    DropdownCloseButton.Size = UDim2.new(0, 22, 0, 22)
+    DropdownCloseButton.Position = UDim2.new(1, -10, 0, 6)
     DropdownCloseButton.AnchorPoint = Vector2.new(1, 0)
     DropdownCloseButton.Text = "X"
     DropdownCloseButton.TextColor3 = Color3.fromRGB(230, 230, 230)
@@ -967,7 +966,6 @@ function nonoya:Window(GuiConfig)
     DropdownCloseButton.ZIndex = 37
     DropdownCloseButton.Name = "DropdownClose"
     DropdownCloseButton.Parent = DropdownSelectReal
-    Instance.new("UICorner", DropdownCloseButton).CornerRadius = UDim.new(0, 6)
 
     DropdownFolder.Name = "DropdownFolder"
     DropdownFolder.Parent = DropdownSelectReal
