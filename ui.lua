@@ -25,6 +25,12 @@ function SaveConfig()
     end
 end
 
+local function SaveConfigEntry(key, value)
+    if not key then return end
+    ConfigData[key] = value
+    SaveConfig()
+end
+
 function LoadConfigFromFile()
     if not CURRENT_VERSION then return end
     if isfile and isfile(ConfigFile) then
@@ -910,6 +916,7 @@ function nonoya:Window(GuiConfig)
     local UICorner36 = Instance.new("UICorner");
     local UIStroke14 = Instance.new("UIStroke");
     local DropdownSelectReal = Instance.new("Frame");
+    local DropdownCloseButton = Instance.new("TextButton");
     local DropdownFolder = Instance.new("Folder");
     local DropdownUIScale = Instance.new("UIScale")
 
@@ -948,6 +955,20 @@ function nonoya:Window(GuiConfig)
     DropdownSelectReal.ZIndex = 36
     DropdownSelectReal.Parent = DropdownSelect
 
+    DropdownCloseButton.BackgroundTransparency = 0.8
+    DropdownCloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    DropdownCloseButton.BorderSizePixel = 0
+    DropdownCloseButton.Size = UDim2.new(0, 26, 0, 26)
+    DropdownCloseButton.Position = UDim2.new(1, -34, 0, 12)
+    DropdownCloseButton.AnchorPoint = Vector2.new(1, 0)
+    DropdownCloseButton.Text = "X"
+    DropdownCloseButton.TextColor3 = Color3.fromRGB(230, 230, 230)
+    DropdownCloseButton.TextSize = 16
+    DropdownCloseButton.ZIndex = 37
+    DropdownCloseButton.Name = "DropdownClose"
+    DropdownCloseButton.Parent = DropdownSelectReal
+    Instance.new("UICorner", DropdownCloseButton).CornerRadius = UDim.new(0, 6)
+
     DropdownFolder.Name = "DropdownFolder"
     DropdownFolder.Parent = DropdownSelectReal
 
@@ -958,13 +979,23 @@ function nonoya:Window(GuiConfig)
     local activeDropdownArrow
     local arrowTweens = {}
     local activeDropdownContainer
-    local function setActiveDropdownContainer(container)
+    local activeDropdownSearchBox
+    local function setActiveDropdownContainer(container, searchBox)
         if activeDropdownContainer and activeDropdownContainer ~= container then
             activeDropdownContainer.Visible = false
+            if activeDropdownSearchBox and activeDropdownSearchBox.Parent then
+                activeDropdownSearchBox.Text = ""
+            end
         end
         activeDropdownContainer = container
+        activeDropdownSearchBox = searchBox
         if activeDropdownContainer then
             activeDropdownContainer.Visible = true
+        end
+    end
+    local function resetActiveDropdownSearch()
+        if activeDropdownSearchBox and activeDropdownSearchBox.Parent then
+            activeDropdownSearchBox.Text = ""
         end
     end
     local overlayShowTime = 0.25
@@ -1009,7 +1040,8 @@ function nonoya:Window(GuiConfig)
             animateArrowState(activeDropdownArrow, false)
             activeDropdownArrow = nil
         end
-        setActiveDropdownContainer(nil)
+        resetActiveDropdownSearch()
+        setActiveDropdownContainer(nil, nil)
         if not MoreBlur.Visible then
             dropdownOpen = false
             return
@@ -1029,7 +1061,7 @@ function nonoya:Window(GuiConfig)
         end)
     end
 
-    local function openDropdownOverlay(container, arrowLabel)
+    local function openDropdownOverlay(container, arrowLabel, searchBox)
         if activeDropdownArrow and activeDropdownArrow ~= arrowLabel then
             animateArrowState(activeDropdownArrow, false)
         end
@@ -1037,7 +1069,10 @@ function nonoya:Window(GuiConfig)
         if activeDropdownArrow then
             animateArrowState(activeDropdownArrow, true)
         end
-        setActiveDropdownContainer(container)
+        if searchBox then
+            searchBox.Text = ""
+        end
+        setActiveDropdownContainer(container, searchBox)
         dropdownOpen = true
         UpdateDropdownSize()
         MoreBlur.Visible = true
@@ -1052,6 +1087,7 @@ function nonoya:Window(GuiConfig)
         dropdownScaleTween:Play()
     end
 
+    DropdownCloseButton.MouseButton1Click:Connect(closeDropdownOverlay)
     ConnectButton.Activated:Connect(closeDropdownOverlay)
     --// Tabs
     local Tabs = {}
@@ -1649,13 +1685,21 @@ function nonoya:Window(GuiConfig)
                 if InputBox then
                     InputBox.FocusLost:Connect(function()
                         PanelFunc.Value = InputBox.Text
-                        ConfigData[configKey] = InputBox.Text
-                        SaveConfig()
                     end)
                 end
 
                 function PanelFunc:GetInput()
                     return InputBox and InputBox.Text or ""
+                end
+
+                function PanelFunc:Save(value)
+                    if value ~= nil then
+                        PanelFunc.Value = value
+                        if InputBox then
+                            InputBox.Text = value
+                        end
+                    end
+                    SaveConfigEntry(configKey, PanelFunc.Value)
                 end
 
                 CountItem = CountItem + 1
@@ -1858,10 +1902,6 @@ function nonoya:Window(GuiConfig)
                         end)
                         if not ok then warn("Toggle Callback error:", err) end
                     end
-                    if not skipSave then
-                        ConfigData[configKey] = Value
-                        SaveConfig()
-                    end
                     if Value then
                         ToggleTitle.TextColor3 = GuiConfig.Color
                         ToggleCircle.Position = UDim2.new(0, 15, 0, 0)
@@ -1877,6 +1917,14 @@ function nonoya:Window(GuiConfig)
                         FeatureFrame2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                         FeatureFrame2.BackgroundTransparency = 0.92
                     end
+                end
+
+                function ToggleFunc:Save(value)
+                    if value ~= nil then
+                        self.Value = value
+                        self:Set(value, true)
+                    end
+                    SaveConfigEntry(configKey, self.Value)
                 end
 
                 ToggleFunc:Set(ToggleFunc.Value)
@@ -2046,7 +2094,7 @@ function nonoya:Window(GuiConfig)
                     end
                     return Result
                 end
-                function SliderFunc:Set(Value)
+                function SliderFunc:Set(Value, skipSave)
                     Value = math.clamp(Round(Value, SliderConfig.Increment), SliderConfig.Min, SliderConfig.Max)
                     SliderFunc.Value = Value
                     TextBox.Text = tostring(Value)
@@ -2056,8 +2104,13 @@ function nonoya:Window(GuiConfig)
                     )
 
                     SliderConfig.Callback(Value)
-                    ConfigData[configKey] = Value
-                    SaveConfig()
+                end
+
+                function SliderFunc:Save(value)
+                    if value ~= nil then
+                        self:Set(value, true)
+                    end
+                    SaveConfigEntry(configKey, self.Value)
                 end
 
                 SliderFrame.InputBegan:Connect(function(Input)
@@ -2217,12 +2270,17 @@ function nonoya:Window(GuiConfig)
                 InputTextBox.Size = UDim2.new(1, -10, 1, -8)
                 InputTextBox.Name = "InputTextBox"
                 InputTextBox.Parent = InputFrame
-                function InputFunc:Set(Value)
+                function InputFunc:Set(Value, skipSave)
                     InputTextBox.Text = Value
                     InputFunc.Value = Value
                     InputConfig.Callback(Value)
-                    ConfigData[configKey] = Value
-                    SaveConfig()
+                end
+
+                function InputFunc:Save(value)
+                    if value ~= nil then
+                        self:Set(value, true)
+                    end
+                    SaveConfigEntry(configKey, self.Value)
                 end
 
                 InputFunc:Set(InputFunc.Value)
@@ -2344,7 +2402,7 @@ function nonoya:Window(GuiConfig)
                 DropdownContainer.Parent = DropdownFolder
 
                 DropdownButton.Activated:Connect(function()
-                    openDropdownOverlay(DropdownContainer, OptionArrow)
+                    openDropdownOverlay(DropdownContainer, OptionArrow, SearchBox)
                 end)
 
                 local SearchBox = Instance.new("TextBox")
@@ -2484,15 +2542,13 @@ function nonoya:Window(GuiConfig)
                     end)
                 end
 
-                function DropdownFunc:Set(Value)
+                function DropdownFunc:Set(Value, skipSave)
                     if DropdownConfig.Multi then
                         DropdownFunc.Value = type(Value) == "table" and Value or {}
                     else
                         DropdownFunc.Value = (type(Value) == "table" and Value[1]) or Value
                     end
 
-                    ConfigData[configKey] = DropdownFunc.Value
-                    SaveConfig()
                     if not DropdownConfig.Multi then
                         closeDropdownOverlay()
                     end
@@ -2529,6 +2585,13 @@ function nonoya:Window(GuiConfig)
                             DropdownConfig.Callback(str)
                         end
                     end
+                end
+
+                function DropdownFunc:Save(value)
+                    if value ~= nil then
+                        self:Set(value, true)
+                    end
+                    SaveConfigEntry(configKey, self.Value)
                 end
 
                 function DropdownFunc:SetValue(val)
