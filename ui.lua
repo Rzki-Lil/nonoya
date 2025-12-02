@@ -59,7 +59,6 @@ function LoadConfigElements()
     end
 end
 
-
 local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
@@ -1894,13 +1893,14 @@ function nonoya:Window(GuiConfig)
                 end)
 
                 function ToggleFunc:Set(Value, skipSave)
+                    self.Value = Value and true or false
                     if typeof(ToggleConfig.Callback) == "function" then
                         local ok, err = pcall(function()
-                            ToggleConfig.Callback(Value)
+                            ToggleConfig.Callback(self.Value)
                         end)
                         if not ok then warn("Toggle Callback error:", err) end
                     end
-                    if Value then
+                    if self.Value then
                         ToggleTitle.TextColor3 = GuiConfig.Color
                         ToggleCircle.Position = UDim2.new(0, 15, 0, 0)
                         UIStroke8.Color = GuiConfig.Color
@@ -1915,17 +1915,19 @@ function nonoya:Window(GuiConfig)
                         FeatureFrame2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                         FeatureFrame2.BackgroundTransparency = 0.92
                     end
+                    if not skipSave then
+                        SaveConfigEntry(configKey, self.Value)
+                    end
                 end
 
                 function ToggleFunc:Save(value)
                     if value ~= nil then
-                        self.Value = value
                         self:Set(value, true)
                     end
                     SaveConfigEntry(configKey, self.Value)
                 end
 
-                ToggleFunc:Set(ToggleFunc.Value)
+                ToggleFunc:Set(ToggleFunc.Value, true)
                 CountItem = CountItem + 1
                 Elements[configKey] = ToggleFunc
                 toggleElements[configKey] = ToggleFunc
