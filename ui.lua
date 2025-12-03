@@ -2585,6 +2585,9 @@ function nonoya:Window(GuiConfig)
                             DropdownConfig.Callback(str)
                         end
                     end
+                    if not skipSave then
+                        SaveConfigEntry(configKey, DropdownFunc.Value)
+                    end
                 end
 
                 function DropdownFunc:Save(value)
