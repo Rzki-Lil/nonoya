@@ -1,48 +1,143 @@
 local HttpService = game:GetService("HttpService")
 local TweenService = game:GetService("TweenService")
 
-if not isfolder("nonoya") then
-    makefolder("nonoya")
+local gameName = tostring(game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name)
+gameName = gameName:gsub("[^%w_ ]", "")
+gameName = gameName:gsub("%s+", "_")
+
+local configFolder = "nonoya/Config/" .. gameName
+local legacyConfigFile = "nonoya/Config/nonoya_" .. gameName .. ".json"
+local defaultConfigName = "autosave"
+local currentConfigName = defaultConfigName
+
+ConfigData = {}
+Elements = {}
+CURRENT_VERSION = nil
+
+local autoSaveEnabled = true
+local autoLoadEnabled = true
+
+local function sanitizeConfigName(name)
+    if not name then
+        return nil
+    end
+    local trimmed = tostring(name):gsub("^%s*(.-)%s*$", "%1")
+    trimmed = trimmed:gsub("[^%w%._%- ]", "")
+    trimmed = trimmed:gsub("%s+", "_")
+    if trimmed == "" then
+        return nil
+    end
+    return trimmed
 end
-if not isfolder("nonoya/Config") then
-    makefolder("nonoya/Config")
-end
 
-local gameName   = tostring(game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name)
-gameName         = gameName:gsub("[^%w_ ]", "")
-gameName         = gameName:gsub("%s+", "_")
-
-local ConfigFile = "nonoya/Config/nonoya_" .. gameName .. ".json"
-
-ConfigData       = {}
-Elements         = {}
-CURRENT_VERSION  = nil
-
-function SaveConfig()
-    if writefile then
-        ConfigData._version = CURRENT_VERSION
-        writefile(ConfigFile, HttpService:JSONEncode(ConfigData))
+local function ensureConfigFolder()
+    if not isfolder("nonoya") then
+        makefolder("nonoya")
+    end
+    if not isfolder("nonoya/Config") then
+        makefolder("nonoya/Config")
+    end
+    if not isfolder(configFolder) then
+        makefolder(configFolder)
     end
 end
 
-function LoadConfigFromFile()
-    if not CURRENT_VERSION then return end
-    if isfile and isfile(ConfigFile) then
+ensureConfigFolder()
+
+local function getConfigFilePath(name)
+    local safe = sanitizeConfigName(name) or defaultConfigName
+    return configFolder .. "/" .. safe .. ".json"
+end
+
+function SaveConfig(configName, opts)
+    opts = opts or {}
+    local targetName = sanitizeConfigName(configName) or currentConfigName or defaultConfigName
+    currentConfigName = targetName
+    ConfigData._version = CURRENT_VERSION
+
+    if not autoSaveEnabled and not opts.force then
+        return false, "autosave disabled"
+    end
+
+    if not writefile then
+        return false, "writefile unavailable"
+    end
+
+    ensureConfigFolder()
+    local path = getConfigFilePath(targetName)
+    writefile(path, HttpService:JSONEncode(ConfigData))
+    return true, path
+end
+
+function LoadConfigFromFile(configName, opts)
+    opts = opts or {}
+    if not CURRENT_VERSION then
+        return false
+    end
+
+    local targetName = sanitizeConfigName(configName) or currentConfigName or defaultConfigName
+    local path = getConfigFilePath(targetName)
+    local pathToUse = path
+
+    if opts.allowLegacy ~= false and (not (isfile and isfile(path))) and isfile and isfile(legacyConfigFile) then
+        pathToUse = legacyConfigFile
+    end
+
+    currentConfigName = targetName
+
+    if isfile and isfile(pathToUse) then
         local success, result = pcall(function()
-            return HttpService:JSONDecode(readfile(ConfigFile))
+            return HttpService:JSONDecode(readfile(pathToUse))
         end)
-        if success and type(result) == "table" then
-            if result._version == CURRENT_VERSION then
-                ConfigData = result
-            else
-                ConfigData = { _version = CURRENT_VERSION }
-            end
-        else
-            ConfigData = { _version = CURRENT_VERSION }
+        if success and type(result) == "table" and result._version == CURRENT_VERSION then
+            ConfigData = result
+            return true, targetName
         end
-    else
-        ConfigData = { _version = CURRENT_VERSION }
     end
+
+    ConfigData = { _version = CURRENT_VERSION }
+    return false, targetName
+end
+
+function ListConfigs()
+    local configs = {}
+    if listfiles and isfolder and isfolder(configFolder) then
+        for _, filePath in ipairs(listfiles(configFolder)) do
+            local name = filePath:match("([^/\\]+)%.json$")
+            if name then
+                table.insert(configs, name)
+            end
+        end
+    end
+    table.sort(configs, function(a, b)
+        return tostring(a):lower() < tostring(b):lower()
+    end)
+    return configs
+end
+
+function DeleteConfig(configName)
+    local targetName = sanitizeConfigName(configName)
+    if not targetName then
+        return false
+    end
+    local path = getConfigFilePath(targetName)
+    if delfile and isfile and isfile(path) then
+        delfile(path)
+        return true
+    end
+    return false
+end
+
+function SetConfigName(configName)
+    local safe = sanitizeConfigName(configName)
+    if safe then
+        currentConfigName = safe
+    end
+    return currentConfigName
+end
+
+function GetCurrentConfigName()
+    return currentConfigName
 end
 
 function LoadConfigElements()
@@ -419,9 +514,22 @@ function nonoya:Window(GuiConfig)
     GuiConfig.Size = GuiConfig.Size or nil
     GuiConfig.Width = GuiConfig.Width or nil
     GuiConfig.Height = GuiConfig.Height or nil
+    GuiConfig.AutoSave = GuiConfig.AutoSave ~= false
+    GuiConfig.AutoLoad = GuiConfig.AutoLoad ~= false
 
-    CURRENT_VERSION        = GuiConfig.Version
-    LoadConfigFromFile()
+    CURRENT_VERSION = GuiConfig.Version
+    Elements = {}
+    autoSaveEnabled = GuiConfig.AutoSave
+    autoLoadEnabled = GuiConfig.AutoLoad
+    if GuiConfig.ConfigName then
+        SetConfigName(GuiConfig.ConfigName)
+    end
+
+    if autoLoadEnabled then
+        LoadConfigFromFile(nil, { allowLegacy = true })
+    else
+        ConfigData = { _version = CURRENT_VERSION }
+    end
 
     local GuiFunc = {}
     local toggleElements = {}
@@ -1890,18 +1998,44 @@ function nonoya:Window(GuiConfig)
                 local SliderConfig = SliderConfig or {}
                 SliderConfig.Title = SliderConfig.Title or "Slider"
                 SliderConfig.Content = SliderConfig.Content or ""
-                SliderConfig.Increment = SliderConfig.Increment or 1
-                SliderConfig.Min = SliderConfig.Min or 0
-                SliderConfig.Max = SliderConfig.Max or 100
-                SliderConfig.Default = SliderConfig.Default or 50
+                SliderConfig.Increment = tonumber(SliderConfig.Increment)
+                if not SliderConfig.Increment or SliderConfig.Increment == 0 then
+                    SliderConfig.Increment = 1
+                end
+                SliderConfig.Min = tonumber(SliderConfig.Min) or 0
+                SliderConfig.Max = tonumber(SliderConfig.Max) or 100
+                if SliderConfig.Max < SliderConfig.Min then
+                    SliderConfig.Max = SliderConfig.Min
+                end
+                if SliderConfig.Default == nil then
+                    SliderConfig.Default = 50
+                end
+                SliderConfig.Default = tonumber(SliderConfig.Default) or SliderConfig.Min
                 SliderConfig.Callback = SliderConfig.Callback or function() end
 
                 local configKey = "Slider_" .. SliderConfig.Title
                 if ConfigData[configKey] ~= nil then
-                    SliderConfig.Default = ConfigData[configKey]
+                    local savedValue = tonumber(ConfigData[configKey])
+                    if savedValue ~= nil then
+                        SliderConfig.Default = savedValue
+                    end
                 end
+                SliderConfig.Default = math.clamp(SliderConfig.Default, SliderConfig.Min, SliderConfig.Max)
 
                 local SliderFunc = { Value = SliderConfig.Default }
+
+                local incrementDecimals = 0
+                local incDecimal = tostring(SliderConfig.Increment):match("%.(%d+)")
+                if incDecimal then
+                    incrementDecimals = #incDecimal
+                end
+
+                local function formatValue(val)
+                    if incrementDecimals > 0 then
+                        return tonumber(string.format("%." .. incrementDecimals .. "f", val)) or val
+                    end
+                    return val
+                end
 
                 local Slider = Instance.new("Frame");
                 local UICorner15 = Instance.new("UICorner");
@@ -2039,24 +2173,31 @@ function nonoya:Window(GuiConfig)
                 UIStroke6.Parent = SliderCircle
 
                 local Dragging = false
+                local InternalSet = false
                 local function Round(Number, Factor)
-                    local Result = math.floor(Number / Factor + (math.sign(Number) * 0.5)) * Factor
-                    if Result < 0 then
-                        Result = Result + Factor
+                    if not Factor or Factor == 0 then
+                        return Number
                     end
-                    return Result
+                    local scaled = Number / Factor
+                    local roundedScaled = (math.round and math.round(scaled)) or math.floor(scaled + 0.5)
+                    local stepped = roundedScaled * Factor
+                    return formatValue(stepped)
                 end
                 function SliderFunc:Set(Value)
-                    Value = math.clamp(Round(Value, SliderConfig.Increment), SliderConfig.Min, SliderConfig.Max)
-                    SliderFunc.Value = Value
-                    TextBox.Text = tostring(Value)
-                    SliderDraggable.Size = UDim2.fromScale(
-                        (Value - SliderConfig.Min) / (SliderConfig.Max - SliderConfig.Min),
-                        1
-                    )
+                    local rounded = math.clamp(Round(tonumber(Value) or SliderConfig.Min, SliderConfig.Increment), SliderConfig.Min, SliderConfig.Max)
+                    SliderFunc.Value = rounded
+                    InternalSet = true
+                    TextBox.Text = tostring(formatValue(rounded))
+                    InternalSet = false
+                    local range = SliderConfig.Max - SliderConfig.Min
+                    local scale = 0
+                    if range ~= 0 then
+                        scale = (rounded - SliderConfig.Min) / range
+                    end
+                    SliderDraggable.Size = UDim2.fromScale(math.clamp(scale, 0, 1), 1)
 
-                    SliderConfig.Callback(Value)
-                    ConfigData[configKey] = Value
+                    SliderConfig.Callback(rounded)
+                    ConfigData[configKey] = rounded
                     SaveConfig()
                 end
 
@@ -2093,12 +2234,13 @@ function nonoya:Window(GuiConfig)
                 end)
 
                 TextBox:GetPropertyChangedSignal("Text"):Connect(function()
-                    local Valid = TextBox.Text:gsub("[^%d]", "")
-                    if Valid ~= "" then
-                        local ValidNumber = math.clamp(tonumber(Valid), SliderConfig.Min, SliderConfig.Max)
-                        SliderFunc:Set(ValidNumber)
-                    else
-                        SliderFunc:Set(SliderConfig.Min)
+                    if InternalSet then
+                        return
+                    end
+                    local sanitized = TextBox.Text:gsub(",", ".")
+                    local number = tonumber(sanitized)
+                    if number ~= nil then
+                        SliderFunc:Set(number)
                     end
                 end)
                 SliderFunc:Set(SliderConfig.Default)
@@ -2619,5 +2761,13 @@ function nonoya:Window(GuiConfig)
 
     return Tabs
 end
+
+nonoya.SaveConfig = SaveConfig
+nonoya.LoadConfigFromFile = LoadConfigFromFile
+nonoya.LoadConfigElements = LoadConfigElements
+nonoya.ListConfigs = ListConfigs
+nonoya.DeleteConfig = DeleteConfig
+nonoya.SetConfigName = SetConfigName
+nonoya.GetCurrentConfigName = GetCurrentConfigName
 
 return nonoya
