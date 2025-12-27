@@ -205,10 +205,27 @@ function GetCurrentConfigName()
     return currentConfigName
 end
 
-function LoadConfigElements()
+function LoadConfigElements(opts)
+    -- Apply loaded config values with a small delay to avoid race conditions when many entries update at once.
+    opts = opts or {}
+    local initialDelay = tonumber(opts.initialDelay) or 0.15
+    local perElementDelay = tonumber(opts.perElementDelay) or 0.05
+
+    if initialDelay > 0 then
+        task.wait(initialDelay)
+    end
+
     for key, element in pairs(Elements) do
         if ConfigData[key] ~= nil and element.Set then
-            element:Set(ConfigData[key], true)
+            local ok, err = pcall(function()
+                element:Set(ConfigData[key], true)
+            end)
+            if not ok then
+                warn("[nonoya config] gagal set " .. tostring(key) .. ": " .. tostring(err))
+            end
+            if perElementDelay > 0 then
+                task.wait(perElementDelay)
+            end
         end
     end
 end
