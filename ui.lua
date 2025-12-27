@@ -7,6 +7,7 @@ gameName = gameName:gsub("%s+", "_")
 
 local configFolder = "nonoya/Config/" .. gameName
 local legacyConfigFile = "nonoya/Config/nonoya_" .. gameName .. ".json"
+local configIndexFile = configFolder .. "/_config_index.json"
 local defaultConfigName = "autosave"
 local currentConfigName = defaultConfigName
 
@@ -49,6 +50,63 @@ local function getConfigFilePath(name)
     return configFolder .. "/" .. safe .. ".json"
 end
 
+local function readConfigIndex()
+    if not isfile or not readfile or not isfile(configIndexFile) then
+        return {}
+    end
+    local ok, data = pcall(function()
+        return HttpService:JSONDecode(readfile(configIndexFile))
+    end)
+    if ok and type(data) == "table" then
+        local list = {}
+        local seen = {}
+        for _, name in ipairs(data) do
+            if type(name) == "string" and name ~= "" and not seen[name] then
+                seen[name] = true
+                table.insert(list, name)
+            end
+        end
+        return list
+    end
+    return {}
+end
+
+local function writeConfigIndex(list)
+    if not writefile then
+        return false
+    end
+    ensureConfigFolder()
+    local ok = pcall(function()
+        writefile(configIndexFile, HttpService:JSONEncode(list or {}))
+    end)
+    return ok
+end
+
+local function updateConfigIndex(configName, remove)
+    local safe = sanitizeConfigName(configName)
+    if not safe then
+        return
+    end
+    local list = readConfigIndex()
+    local exists = false
+    for i, name in ipairs(list) do
+        if name == safe then
+            exists = true
+            if remove then
+                table.remove(list, i)
+            end
+            break
+        end
+    end
+    if not remove and not exists then
+        table.insert(list, safe)
+    end
+    table.sort(list, function(a, b)
+        return tostring(a):lower() < tostring(b):lower()
+    end)
+    writeConfigIndex(list)
+end
+
 function SaveConfig(configName, opts)
     opts = opts or {}
     local targetName = sanitizeConfigName(configName) or currentConfigName or defaultConfigName
@@ -66,6 +124,7 @@ function SaveConfig(configName, opts)
     ensureConfigFolder()
     local path = getConfigFilePath(targetName)
     writefile(path, HttpService:JSONEncode(ConfigData))
+    updateConfigIndex(targetName, false)
     return true, path
 end
 
@@ -104,10 +163,15 @@ function ListConfigs()
     if listfiles and isfolder and isfolder(configFolder) then
         for _, filePath in ipairs(listfiles(configFolder)) do
             local name = filePath:match("([^/\\]+)%.json$")
-            if name then
+            if name and name ~= "_config_index" then
                 table.insert(configs, name)
             end
         end
+    end
+    if #configs == 0 then
+        configs = readConfigIndex()
+    else
+        writeConfigIndex(configs)
     end
     table.sort(configs, function(a, b)
         return tostring(a):lower() < tostring(b):lower()
@@ -123,6 +187,7 @@ function DeleteConfig(configName)
     local path = getConfigFilePath(targetName)
     if delfile and isfile and isfile(path) then
         delfile(path)
+        updateConfigIndex(targetName, true)
         return true
     end
     return false
