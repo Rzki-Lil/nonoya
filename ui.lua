@@ -211,11 +211,38 @@ function LoadConfigElements(opts)
     local initialDelay = tonumber(opts.initialDelay) or 0.15
     local perElementDelay = tonumber(opts.perElementDelay) or 0.05
 
+    local function getLoadPriority(key)
+        local prefix = tostring(key):match("^(%w+)_")
+        if prefix == "Dropdown" or prefix == "Input" then
+            return 1
+        elseif prefix == "Panel" or prefix == "Slider" then
+            return 2
+        elseif prefix == "Toggle" then
+            return 3
+        end
+        return 2
+    end
+
     if initialDelay > 0 then
         task.wait(initialDelay)
     end
 
+    local ordered = {}
     for key, element in pairs(Elements) do
+        ordered[#ordered + 1] = { key = key, element = element }
+    end
+
+    table.sort(ordered, function(a, b)
+        local pa, pb = getLoadPriority(a.key), getLoadPriority(b.key)
+        if pa == pb then
+            return tostring(a.key) < tostring(b.key)
+        end
+        return pa < pb
+    end)
+
+    for _, entry in ipairs(ordered) do
+        local key = entry.key
+        local element = entry.element
         if ConfigData[key] ~= nil and element.Set then
             local ok, err = pcall(function()
                 element:Set(ConfigData[key], true)
