@@ -1,6 +1,5 @@
 local HttpService = game:GetService("HttpService")
 local TweenService = game:GetService("TweenService")
-
 local gameName = tostring(game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name)
 gameName = gameName:gsub("[^%w_ ]", "")
 gameName = gameName:gsub("%s+", "_")
@@ -256,7 +255,6 @@ function LoadConfigElements(opts)
         end
     end
 end
-
 
 local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
@@ -610,26 +608,26 @@ function nonoyaNotify(msg, delay, color, title, desc)
 end
 
 function nonoya:Window(GuiConfig)
-    GuiConfig              = GuiConfig or {}
-    GuiConfig.Title       = GuiConfig.Title or "nonoya"
-    GuiConfig.Footer      = GuiConfig.Footer or "nonoya"
-    GuiConfig.Color       = GuiConfig.Color or Color3.fromRGB(255, 0, 255)
-    GuiConfig.Version     = GuiConfig.Version or 1
-    GuiConfig.ToggleText  = GuiConfig.ToggleText or "NN"
-    GuiConfig.TabWidth    = GuiConfig.TabWidth or 180
-    GuiConfig.MainTransparency = GuiConfig.MainTransparency or 0
-    GuiConfig.TabTransparency = GuiConfig.TabTransparency or 0
+    GuiConfig                     = GuiConfig or {}
+    GuiConfig.Title               = GuiConfig.Title or "nonoya"
+    GuiConfig.Footer              = GuiConfig.Footer or "nonoya"
+    GuiConfig.Color               = GuiConfig.Color or Color3.fromRGB(255, 0, 255)
+    GuiConfig.Version             = GuiConfig.Version or 1
+    GuiConfig.ToggleText          = GuiConfig.ToggleText or "NN"
+    GuiConfig.TabWidth            = GuiConfig.TabWidth or 180
+    GuiConfig.MainTransparency    = GuiConfig.MainTransparency or 0
+    GuiConfig.TabTransparency     = GuiConfig.TabTransparency or 0
     GuiConfig.ContentTransparency = GuiConfig.ContentTransparency or 0
-    GuiConfig.Size = GuiConfig.Size or nil
-    GuiConfig.Width = GuiConfig.Width or nil
-    GuiConfig.Height = GuiConfig.Height or nil
-    GuiConfig.AutoSave = GuiConfig.AutoSave ~= false
-    GuiConfig.AutoLoad = GuiConfig.AutoLoad ~= false
+    GuiConfig.Size                = GuiConfig.Size or nil
+    GuiConfig.Width               = GuiConfig.Width or nil
+    GuiConfig.Height              = GuiConfig.Height or nil
+    GuiConfig.AutoSave            = GuiConfig.AutoSave ~= false
+    GuiConfig.AutoLoad            = GuiConfig.AutoLoad ~= false
 
-    CURRENT_VERSION = GuiConfig.Version
-    Elements = {}
-    autoSaveEnabled = GuiConfig.AutoSave
-    autoLoadEnabled = GuiConfig.AutoLoad
+    CURRENT_VERSION               = GuiConfig.Version
+    Elements                      = {}
+    autoSaveEnabled               = GuiConfig.AutoSave
+    autoLoadEnabled               = GuiConfig.AutoLoad
     if GuiConfig.ConfigName then
         SetConfigName(GuiConfig.ConfigName)
     end
@@ -1246,41 +1244,20 @@ function nonoya:Window(GuiConfig)
         end)
     end
 
-    local function openDropdownOverlay(container, arrowLabel)
-        if activeDropdownArrow and activeDropdownArrow ~= arrowLabel then
-            animateArrowState(activeDropdownArrow, false)
-        end
-        activeDropdownArrow = arrowLabel
-        if activeDropdownArrow then
-            animateArrowState(activeDropdownArrow, true)
-        end
-        setActiveDropdownContainer(container)
-        dropdownOpen = true
-        UpdateDropdownSize()
-        MoreBlur.Visible = true
-        DropdownSelect.Visible = true
-        MoreBlur.BackgroundTransparency = 1
-        DropdownUIScale.Scale = 0.9
-        if dropdownBlurTween then dropdownBlurTween:Cancel() end
-        if dropdownScaleTween then dropdownScaleTween:Cancel() end
-        dropdownBlurTween = TweenService:Create(MoreBlur, overlayShowInfo, { BackgroundTransparency = 0.35 })
-        dropdownScaleTween = TweenService:Create(DropdownUIScale, dropdownScaleShowInfo, { Scale = 1 })
-        dropdownBlurTween:Play()
-        dropdownScaleTween:Play()
-    end
-
     ConnectButton.Activated:Connect(closeDropdownOverlay)
     --// Tabs
     local Tabs = {}
     local CountTab = 0
     local ActiveTab = nil
+    local TweenService = game:GetService("TweenService")
+
     function Tabs:AddTab(TabConfig)
         local TabConfig = TabConfig or {}
         TabConfig.Name = TabConfig.Name or "Tab"
         TabConfig.Icon = TabConfig.Icon or ""
 
-        local ScrolLayers = Instance.new("ScrollingFrame");
-        local UIListLayout1 = Instance.new("UIListLayout");
+        local ScrolLayers = Instance.new("ScrollingFrame")
+        local UIListLayout1 = Instance.new("UIListLayout")
 
         ScrolLayers.ScrollBarImageColor3 = GuiConfig.Color
         ScrolLayers.ScrollBarThickness = 2
@@ -1296,12 +1273,12 @@ function nonoya:Window(GuiConfig)
         UIListLayout1.SortOrder = Enum.SortOrder.LayoutOrder
         UIListLayout1.Parent = ScrolLayers
 
-        local Tab = Instance.new("Frame");
-        local UICorner3 = Instance.new("UICorner");
-        local TabButton = Instance.new("TextButton");
+        local Tab = Instance.new("Frame")
+        local UICorner3 = Instance.new("UICorner")
+        local TabButton = Instance.new("TextButton")
         local TabName = Instance.new("TextLabel")
-        local IconLabel = Instance.new("TextLabel");
-        local TabIndicator = Instance.new("Frame");
+        local IconLabel = Instance.new("TextLabel")
+        local TabIndicator = Instance.new("Frame")
 
         Tab.BackgroundColor3 = Color3.fromRGB(33, 39, 54)
         Tab.BackgroundTransparency = CountTab == 0 and 0.08 or 0.55
@@ -1340,7 +1317,8 @@ function nonoya:Window(GuiConfig)
 
         IconLabel.Font = Enum.Font.GothamBold
         IconLabel.Text = TabConfig.Icon
-        IconLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
+        IconLabel.TextColor3 = CountTab == 0 and (GuiConfig.Color or Color3.fromRGB(100, 200, 255)) or
+            Color3.fromRGB(180, 180, 180)
         IconLabel.TextSize = 13
         IconLabel.TextXAlignment = Enum.TextXAlignment.Center
         IconLabel.TextYAlignment = Enum.TextYAlignment.Center
@@ -1359,13 +1337,16 @@ function nonoya:Window(GuiConfig)
             TabName.TextXAlignment = Enum.TextXAlignment.Left
         end
 
-        TabIndicator.BackgroundColor3 = GuiConfig.Color
+        TabIndicator.BackgroundColor3 = GuiConfig.Color or Color3.fromRGB(100, 200, 255)
         TabIndicator.BorderSizePixel = 0
-        TabIndicator.Size = UDim2.new(0, 3, 1, 0)
+        TabIndicator.Size = UDim2.new(0, CountTab == 0 and 3 or 0, 1, 0)
         TabIndicator.Position = UDim2.new(0, 0, 0, 0)
         TabIndicator.Name = "TabIndicator"
-        TabIndicator.Visible = CountTab == 0
         TabIndicator.Parent = Tab
+
+        local UICornerIndicator = Instance.new("UICorner")
+        UICornerIndicator.CornerRadius = UDim.new(0, 2)
+        UICornerIndicator.Parent = TabIndicator
 
         if CountTab == 0 then
             ActiveTab = Tab
@@ -1373,16 +1354,35 @@ function nonoya:Window(GuiConfig)
             NameTab.Text = TabConfig.Name
         end
 
+        local isHovering = false
+
         local function deactivate(tabFrame)
             if not tabFrame then return end
-            tabFrame.BackgroundTransparency = 0.55
+
+            -- Animasi background transparency
+            TweenService:Create(tabFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                BackgroundTransparency = 0.55
+            }):Play()
+
             local tabText = tabFrame:FindFirstChild("TabName")
             if tabText then
-                tabText.TextColor3 = Color3.fromRGB(180, 186, 202)
+                TweenService:Create(tabText, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                    TextColor3 = Color3.fromRGB(180, 186, 202)
+                }):Play()
             end
+
+            local icon = tabFrame:FindFirstChild("IconLabel")
+            if icon then
+                TweenService:Create(icon, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                    TextColor3 = Color3.fromRGB(180, 180, 180)
+                }):Play()
+            end
+
             local indicator = tabFrame:FindFirstChild("TabIndicator")
             if indicator then
-                indicator.Visible = false
+                TweenService:Create(indicator, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                    Size = UDim2.new(0, 0, 1, 0)
+                }):Play()
             end
         end
 
@@ -1390,12 +1390,71 @@ function nonoya:Window(GuiConfig)
             if ActiveTab == Tab then return end
             deactivate(ActiveTab)
             ActiveTab = Tab
-            Tab.BackgroundTransparency = 0.08
-            TabName.TextColor3 = Color3.fromRGB(245, 245, 245)
-            TabIndicator.Visible = true
+
+            -- Animasi background transparency
+            TweenService:Create(Tab, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                BackgroundTransparency = 0.08
+            }):Play()
+
+            -- Animasi text color
+            TweenService:Create(TabName, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                TextColor3 = Color3.fromRGB(245, 245, 245)
+            }):Play()
+
+            -- Animasi icon color
+            if IconLabel.Visible then
+                TweenService:Create(IconLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                    TextColor3 = GuiConfig.Color or Color3.fromRGB(100, 200, 255)
+                }):Play()
+            end
+
+            -- Animasi indicator slide in
+            TweenService:Create(TabIndicator, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                Size = UDim2.new(0, 3, 1, 0)
+            }):Play()
+
             NameTab.Text = TabConfig.Name
             LayersPageLayout:JumpToIndex(Tab.LayoutOrder)
         end
+
+        -- Hover effects
+        TabButton.MouseEnter:Connect(function()
+            isHovering = true
+            if ActiveTab ~= Tab then
+                TweenService:Create(Tab, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {
+                    BackgroundTransparency = 0.35
+                }):Play()
+
+                TweenService:Create(TabName, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {
+                    TextColor3 = Color3.fromRGB(220, 220, 220)
+                }):Play()
+
+                if IconLabel.Visible then
+                    TweenService:Create(IconLabel, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {
+                        TextColor3 = Color3.fromRGB(210, 210, 210)
+                    }):Play()
+                end
+            end
+        end)
+
+        TabButton.MouseLeave:Connect(function()
+            isHovering = false
+            if ActiveTab ~= Tab then
+                TweenService:Create(Tab, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {
+                    BackgroundTransparency = 0.55
+                }):Play()
+
+                TweenService:Create(TabName, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {
+                    TextColor3 = Color3.fromRGB(180, 186, 202)
+                }):Play()
+
+                if IconLabel.Visible then
+                    TweenService:Create(IconLabel, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {
+                        TextColor3 = Color3.fromRGB(180, 180, 180)
+                    }):Play()
+                end
+            end
+        end)
 
         TabButton.Activated:Connect(function()
             activate()
@@ -1403,33 +1462,33 @@ function nonoya:Window(GuiConfig)
         --// Section
         local Sections = {}
         local CountSection = 0
+        local AllSections = {} -- Track semua section untuk auto-close
+
         function Sections:AddSection(Title, AlwaysOpen)
             local Title = Title or "Title"
-            local Section = Instance.new("Frame");
-            local SectionDecideFrame = Instance.new("Frame");
+            local Section = Instance.new("Frame")
+            local SectionDecideFrame = Instance.new("Frame")
 
             Section.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            Section.BackgroundTransparency = 0.9990000128746033
+            Section.BackgroundTransparency = 0.999
             Section.BorderColor3 = Color3.fromRGB(0, 0, 0)
             Section.BorderSizePixel = 0
             Section.LayoutOrder = CountSection
             Section.ClipsDescendants = true
-            Section.LayoutOrder = 1
             Section.Size = UDim2.new(1, 0, 0, 30)
             Section.Name = "Section"
             Section.Parent = ScrolLayers
 
-            local SectionReal = Instance.new("Frame");
-            local UICorner = Instance.new("UICorner");
-            local UIStroke = Instance.new("UIStroke");
-            local SectionButton = Instance.new("TextButton");
-            local FeatureFrame = Instance.new("Frame");
-            local ArrowLabel = Instance.new("TextLabel");
-            local SectionTitle = Instance.new("TextLabel");
+            local SectionReal = Instance.new("Frame")
+            local UICorner = Instance.new("UICorner")
+            local SectionButton = Instance.new("TextButton")
+            local FeatureFrame = Instance.new("Frame")
+            local ArrowLabel = Instance.new("TextLabel")
+            local SectionTitle = Instance.new("TextLabel")
 
             SectionReal.AnchorPoint = Vector2.new(0.5, 0)
             SectionReal.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            SectionReal.BackgroundTransparency = 0.9350000023841858
+            SectionReal.BackgroundTransparency = 0.935
             SectionReal.BorderColor3 = Color3.fromRGB(0, 0, 0)
             SectionReal.BorderSizePixel = 0
             SectionReal.LayoutOrder = 1
@@ -1446,7 +1505,7 @@ function nonoya:Window(GuiConfig)
             SectionButton.TextColor3 = Color3.fromRGB(0, 0, 0)
             SectionButton.TextSize = 14
             SectionButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            SectionButton.BackgroundTransparency = 0.9990000128746033
+            SectionButton.BackgroundTransparency = 0.999
             SectionButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
             SectionButton.BorderSizePixel = 0
             SectionButton.Size = UDim2.new(1, 0, 1, 0)
@@ -1455,7 +1514,7 @@ function nonoya:Window(GuiConfig)
 
             FeatureFrame.AnchorPoint = Vector2.new(1, 0.5)
             FeatureFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-            FeatureFrame.BackgroundTransparency = 0.9990000128746033
+            FeatureFrame.BackgroundTransparency = 0.999
             FeatureFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
             FeatureFrame.BorderSizePixel = 0
             FeatureFrame.Position = UDim2.new(1, -5, 0.5, 0)
@@ -1474,13 +1533,13 @@ function nonoya:Window(GuiConfig)
 
             SectionTitle.Font = Enum.Font.GothamBold
             SectionTitle.Text = Title
-            SectionTitle.TextColor3 = Color3.fromRGB(230.77499270439148, 230.77499270439148, 230.77499270439148)
+            SectionTitle.TextColor3 = Color3.fromRGB(230, 230, 230)
             SectionTitle.TextSize = 13
             SectionTitle.TextXAlignment = Enum.TextXAlignment.Left
             SectionTitle.TextYAlignment = Enum.TextYAlignment.Top
             SectionTitle.AnchorPoint = Vector2.new(0, 0.5)
             SectionTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            SectionTitle.BackgroundTransparency = 0.9990000128746033
+            SectionTitle.BackgroundTransparency = 0.999
             SectionTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
             SectionTitle.BorderSizePixel = 0
             SectionTitle.Position = UDim2.new(0, 10, 0.5, 0)
@@ -1498,20 +1557,20 @@ function nonoya:Window(GuiConfig)
             SectionDecideFrame.Name = "SectionDecideFrame"
             SectionDecideFrame.Parent = Section
 
-            --// Section Add
-            local SectionAdd = Instance.new("Frame");
-            local UICorner8 = Instance.new("UICorner");
-            local UIListLayout2 = Instance.new("UIListLayout");
+            -- Section Add
+            local SectionAdd = Instance.new("Frame")
+            local UICorner8 = Instance.new("UICorner")
+            local UIListLayout2 = Instance.new("UIListLayout")
 
             SectionAdd.AnchorPoint = Vector2.new(0.5, 0)
             SectionAdd.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            SectionAdd.BackgroundTransparency = 0.9990000128746033
+            SectionAdd.BackgroundTransparency = 0.999
             SectionAdd.BorderColor3 = Color3.fromRGB(0, 0, 0)
             SectionAdd.BorderSizePixel = 0
-            SectionAdd.ClipsDescendants = true
+            SectionAdd.ClipsDescendants = false -- UBAH DARI true JADI false
             SectionAdd.LayoutOrder = 1
             SectionAdd.Position = UDim2.new(0.5, 0, 0, 38)
-            SectionAdd.Size = UDim2.new(1, 0, 0, 100)
+            SectionAdd.Size = UDim2.new(1, 0, 0, 0)
             SectionAdd.Name = "SectionAdd"
             SectionAdd.Parent = Section
             SectionAdd.Visible = false
@@ -1549,30 +1608,91 @@ function nonoya:Window(GuiConfig)
                 if AlwaysOpen == true or not ArrowLabel or not ArrowLabel.Parent then
                     return
                 end
-                ArrowLabel.Text = ">"
+
                 local targetRotation = OpenSection and 90 or 0
-                local targetColor = OpenSection and GuiConfig.Color or Color3.fromRGB(220, 220, 220)
-                ArrowLabel.Rotation = targetRotation
-                ArrowLabel.TextColor3 = targetColor
+                local targetColor = OpenSection and (GuiConfig.Color or Color3.fromRGB(100, 200, 255)) or
+                    Color3.fromRGB(220, 220, 220)
+
+                TweenService:Create(ArrowLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                    Rotation = targetRotation,
+                    TextColor3 = targetColor
+                }):Play()
+            end
+
+            local function animateLineState()
+                local targetSize = OpenSection and UDim2.new(1, 0, 0, 1) or UDim2.new(0, 0, 0, 1)
+                local targetColor = OpenSection and (GuiConfig.Color or Color3.fromRGB(100, 200, 255)) or
+                    Color3.fromRGB(70, 75, 86)
+
+                TweenService:Create(SectionDecideFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                    Size = targetSize,
+                    BackgroundColor3 = targetColor
+                }):Play()
             end
 
             local function UpdateSizeSection()
                 local sectionTargetHeight = OpenSection and getSectionContentHeight() or 30
                 local sectionAddHeight = math.max(0, sectionTargetHeight - 38)
-                local decideSize = OpenSection and UDim2.new(1, 0, 0, 1) or UDim2.new(0, 0, 0, 1)
 
-                Section.Size = UDim2.new(1, 1, 0, sectionTargetHeight)
-                SectionAdd.Size = UDim2.new(1, 0, 0, OpenSection and sectionAddHeight or 0)
-                SectionAdd.Visible = OpenSection
-                SectionDecideFrame.Size = decideSize
-                UpdateSizeScroll()
+                -- Animasi Section height
+                TweenService:Create(Section, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                    Size = UDim2.new(1, 1, 0, sectionTargetHeight)
+                }):Play()
+
+                -- Animasi SectionAdd
+                if OpenSection then
+                    SectionAdd.Visible = true
+                    TweenService:Create(SectionAdd, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                        Size = UDim2.new(1, 0, 0, sectionAddHeight)
+                    }):Play()
+                else
+                    local hideTween = TweenService:Create(SectionAdd, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                        Size = UDim2.new(1, 0, 0, 0)
+                    })
+                    hideTween.Completed:Connect(function()
+                        if not OpenSection then
+                            SectionAdd.Visible = false
+                        end
+                    end)
+                    hideTween:Play()
+                end
+
                 animateArrowState()
+                animateLineState()
+
+                task.delay(0.3, function()
+                    UpdateSizeScroll()
+                end)
             end
 
             local function setSectionState(newState)
+                if OpenSection == newState then return end
                 OpenSection = newState
+
+                -- Auto-close section lain (kecuali yang AlwaysOpen)
+                if OpenSection and AlwaysOpen ~= true then
+                    for _, otherSection in pairs(AllSections) do
+                        if otherSection.section ~= Section and not otherSection.alwaysOpen and otherSection.closeFunction then
+                            otherSection.closeFunction()
+                        end
+                    end
+                end
+
                 UpdateSizeSection()
             end
+
+            -- Simpan section data untuk auto-close
+            local sectionData = {
+                section = Section,
+                alwaysOpen = AlwaysOpen,
+                closeFunction = function()
+                    if not AlwaysOpen and OpenSection then
+                        OpenSection = false
+                        UpdateSizeSection()
+                    end
+                end
+            }
+            table.insert(AllSections, sectionData)
 
             if AlwaysOpen == true then
                 SectionButton:Destroy()
@@ -1586,16 +1706,37 @@ function nonoya:Window(GuiConfig)
 
             if AlwaysOpen ~= true then
                 SectionButton.Activated:Connect(function()
-                    CircleClick(SectionButton, Mouse.X, Mouse.Y)
+                    if CircleClick then
+                        CircleClick(SectionButton, Mouse.X, Mouse.Y)
+                    end
                     setSectionState(not OpenSection)
                 end)
             end
 
-            SectionAdd.ChildAdded:Connect(function()
-                UpdateSizeSection()
+            -- TAMBAHKAN INI: Monitor perubahan size children untuk update section height
+            SectionAdd.ChildAdded:Connect(function(child)
+                task.delay(0.05, function()
+                    if OpenSection then
+                        UpdateSizeSection()
+                    end
+                end)
+
+                -- Monitor size changes dari child (untuk dropdown yang expand)
+                child:GetPropertyChangedSignal("Size"):Connect(function()
+                    task.delay(0.05, function()
+                        if OpenSection then
+                            UpdateSizeSection()
+                        end
+                    end)
+                end)
             end)
+
             SectionAdd.ChildRemoved:Connect(function()
-                UpdateSizeSection()
+                task.delay(0.05, function()
+                    if OpenSection then
+                        UpdateSizeSection()
+                    end
+                end)
             end)
 
             local layout = ScrolLayers:FindFirstChildOfClass("UIListLayout")
@@ -1604,6 +1745,8 @@ function nonoya:Window(GuiConfig)
                     ScrolLayers.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
                 end)
             end
+
+            CountSection = CountSection + 1
 
             local Items = {}
             local CountItem = 0
@@ -1879,6 +2022,9 @@ function nonoya:Window(GuiConfig)
                 return PanelFunc
             end
 
+            -- simpan tombol row yang belum punya pasangan
+            local PendingRowConfig = nil
+
             function Items:AddButton(ButtonConfig)
                 ButtonConfig = ButtonConfig or {}
                 ButtonConfig.Title = ButtonConfig.Title or "Confirm"
@@ -1886,6 +2032,85 @@ function nonoya:Window(GuiConfig)
                 ButtonConfig.SubTitle = ButtonConfig.SubTitle or nil
                 ButtonConfig.SubCallback = ButtonConfig.SubCallback or function() end
 
+                local function CreateTextButton(parent, text, callback)
+                    local btn = Instance.new("TextButton")
+                    btn.Font = Enum.Font.GothamBold
+                    btn.Text = text
+                    btn.TextSize = 12
+                    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    btn.TextTransparency = 0.3
+                    btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    btn.BackgroundTransparency = 0.935
+                    btn.Parent = parent
+
+                    local corner = Instance.new("UICorner")
+                    corner.CornerRadius = UDim.new(0, 4)
+                    corner.Parent = btn
+
+                    btn.MouseButton1Click:Connect(callback)
+                    return btn
+                end
+
+                -- =========================================================
+                -- MODE: Row = true (dipakai 2 kali)
+                -- =========================================================
+                if ButtonConfig.Row == true then
+                    -- call pertama: simpan dulu
+                    if not PendingRowConfig then
+                        PendingRowConfig = ButtonConfig
+                        return
+                    end
+
+                    -- call kedua: bikin 1 baris 2 tombol
+                    local leftCfg = PendingRowConfig
+                    local rightCfg = ButtonConfig
+                    PendingRowConfig = nil
+
+                    local gap = rightCfg.Gap or leftCfg.Gap or 8
+                    local halfGap = math.floor(gap / 2)
+
+                    local RowFrame = Instance.new("Frame")
+                    RowFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    RowFrame.BackgroundTransparency = 0.935
+                    RowFrame.Size = UDim2.new(1, 0, 0, 40)
+                    RowFrame.LayoutOrder = CountItem
+                    RowFrame.Parent = SectionAdd
+
+                    local rowCorner = Instance.new("UICorner")
+                    rowCorner.CornerRadius = UDim.new(0, 4)
+                    rowCorner.Parent = RowFrame
+
+                    -- padding dalam (sama feel dengan kode awal kamu)
+                    local pad = Instance.new("UIPadding")
+                    pad.PaddingLeft = UDim.new(0, 6)
+                    pad.PaddingRight = UDim.new(0, 6)
+                    pad.PaddingTop = UDim.new(0, 5)
+                    pad.PaddingBottom = UDim.new(0, 5)
+                    pad.Parent = RowFrame
+
+                    -- 2 tombol sejajar kiri->kanan
+                    local layout = Instance.new("UIListLayout")
+                    layout.FillDirection = Enum.FillDirection.Horizontal
+                    layout.SortOrder = Enum.SortOrder.LayoutOrder
+                    layout.Padding = UDim.new(0, gap)
+                    layout.VerticalAlignment = Enum.VerticalAlignment.Center
+                    layout.Parent = RowFrame
+
+                    local btnL = CreateTextButton(RowFrame, leftCfg.Title, leftCfg.Callback)
+                    btnL.LayoutOrder = 1
+                    btnL.Size = UDim2.new(0.5, -halfGap, 1, 0)
+
+                    local btnR = CreateTextButton(RowFrame, rightCfg.Title, rightCfg.Callback)
+                    btnR.LayoutOrder = 2
+                    btnR.Size = UDim2.new(0.5, -halfGap, 1, 0)
+
+                    CountItem = CountItem + 1
+                    return
+                end
+
+                -- =========================================================
+                -- MODE LAMA: 1 tombol (atau 2 tombol via SubTitle)
+                -- =========================================================
                 local Button = Instance.new("Frame")
                 Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 Button.BackgroundTransparency = 0.935
@@ -1897,42 +2122,14 @@ function nonoya:Window(GuiConfig)
                 UICorner.CornerRadius = UDim.new(0, 4)
                 UICorner.Parent = Button
 
-                local MainButton = Instance.new("TextButton")
-                MainButton.Font = Enum.Font.GothamBold
-                MainButton.Text = ButtonConfig.Title
-                MainButton.TextSize = 12
-                MainButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-                MainButton.TextTransparency = 0.3
-                MainButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                MainButton.BackgroundTransparency = 0.935
+                local MainButton = CreateTextButton(Button, ButtonConfig.Title, ButtonConfig.Callback)
                 MainButton.Size = ButtonConfig.SubTitle and UDim2.new(0.5, -8, 1, -10) or UDim2.new(1, -12, 1, -10)
                 MainButton.Position = UDim2.new(0, 6, 0, 5)
-                MainButton.Parent = Button
-
-                local mainCorner = Instance.new("UICorner")
-                mainCorner.CornerRadius = UDim.new(0, 4)
-                mainCorner.Parent = MainButton
-
-                MainButton.MouseButton1Click:Connect(ButtonConfig.Callback)
 
                 if ButtonConfig.SubTitle then
-                    local SubButton = Instance.new("TextButton")
-                    SubButton.Font = Enum.Font.GothamBold
-                    SubButton.Text = ButtonConfig.SubTitle
-                    SubButton.TextSize = 12
-                    SubButton.TextTransparency = 0.3
-                    SubButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-                    SubButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                    SubButton.BackgroundTransparency = 0.935
+                    local SubButton = CreateTextButton(Button, ButtonConfig.SubTitle, ButtonConfig.SubCallback)
                     SubButton.Size = UDim2.new(0.5, -8, 1, -10)
                     SubButton.Position = UDim2.new(0.5, 2, 0, 5)
-                    SubButton.Parent = Button
-
-                    local subCorner = Instance.new("UICorner")
-                    subCorner.CornerRadius = UDim.new(0, 4)
-                    subCorner.Parent = SubButton
-
-                    SubButton.MouseButton1Click:Connect(ButtonConfig.SubCallback)
                 end
 
                 CountItem = CountItem + 1
@@ -2143,32 +2340,31 @@ function nonoya:Window(GuiConfig)
                     if incrementDecimals > 0 then
                         return tonumber(string.format("%." .. incrementDecimals .. "f", val)) or val
                     end
-                    return val
+                    return math.floor(val + 0.5)
                 end
 
-                local Slider = Instance.new("Frame");
-                local UICorner15 = Instance.new("UICorner");
-                local SliderTitle = Instance.new("TextLabel");
-                local SliderContent = Instance.new("TextLabel");
-                local SliderInput = Instance.new("Frame");
-                local UICorner16 = Instance.new("UICorner");
-                local TextBox = Instance.new("TextBox");
-                local SliderFrame = Instance.new("Frame");
-                local UICorner17 = Instance.new("UICorner");
-                local SliderDraggable = Instance.new("Frame");
-                local UICorner18 = Instance.new("UICorner");
-                local UIStroke5 = Instance.new("UIStroke");
-                local SliderCircle = Instance.new("Frame");
-                local UICorner19 = Instance.new("UICorner");
-                local UIStroke6 = Instance.new("UIStroke");
-                local UIStroke7 = Instance.new("UIStroke");
+                local Slider = Instance.new("Frame")
+                local UICorner15 = Instance.new("UICorner")
+                local SliderTitle = Instance.new("TextLabel")
+                local SliderContent = Instance.new("TextLabel")
+                local SliderInput = Instance.new("Frame")
+                local UICorner16 = Instance.new("UICorner")
+                local TextBox = Instance.new("TextBox")
+                local SliderFrame = Instance.new("Frame")
+                local UICorner17 = Instance.new("UICorner")
+                local SliderDraggable = Instance.new("Frame")
+                local UICorner18 = Instance.new("UICorner")
+
+                -- Min/Max labels
+                local MinLabel = Instance.new("TextLabel")
+                local MaxLabel = Instance.new("TextLabel")
 
                 Slider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                Slider.BackgroundTransparency = 0.9350000023841858
+                Slider.BackgroundTransparency = 0.935
                 Slider.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 Slider.BorderSizePixel = 0
                 Slider.LayoutOrder = CountItem
-                Slider.Size = UDim2.new(1, 0, 0, 46)
+                Slider.Size = UDim2.new(1, 0, 0, 68)
                 Slider.Name = "Slider"
                 Slider.Parent = SectionAdd
 
@@ -2177,16 +2373,16 @@ function nonoya:Window(GuiConfig)
 
                 SliderTitle.Font = Enum.Font.GothamBold
                 SliderTitle.Text = SliderConfig.Title
-                SliderTitle.TextColor3 = Color3.fromRGB(230.77499270439148, 230.77499270439148, 230.77499270439148)
+                SliderTitle.TextColor3 = Color3.fromRGB(230, 230, 230)
                 SliderTitle.TextSize = 13
                 SliderTitle.TextXAlignment = Enum.TextXAlignment.Left
                 SliderTitle.TextYAlignment = Enum.TextYAlignment.Top
                 SliderTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                SliderTitle.BackgroundTransparency = 0.9990000128746033
+                SliderTitle.BackgroundTransparency = 0.999
                 SliderTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 SliderTitle.BorderSizePixel = 0
                 SliderTitle.Position = UDim2.new(0, 10, 0, 10)
-                SliderTitle.Size = UDim2.new(1, -180, 0, 13)
+                SliderTitle.Size = UDim2.new(1, -100, 0, 13)
                 SliderTitle.Name = "SliderTitle"
                 SliderTitle.Parent = Slider
 
@@ -2194,126 +2390,131 @@ function nonoya:Window(GuiConfig)
                 SliderContent.Text = SliderConfig.Content
                 SliderContent.TextColor3 = Color3.fromRGB(255, 255, 255)
                 SliderContent.TextSize = 12
-                SliderContent.TextTransparency = 0.6000000238418579
+                SliderContent.TextTransparency = 0.6
+                SliderContent.TextWrapped = true
                 SliderContent.TextXAlignment = Enum.TextXAlignment.Left
-                SliderContent.TextYAlignment = Enum.TextYAlignment.Bottom
+                SliderContent.TextYAlignment = Enum.TextYAlignment.Top
                 SliderContent.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                SliderContent.BackgroundTransparency = 0.9990000128746033
+                SliderContent.BackgroundTransparency = 0.999
                 SliderContent.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 SliderContent.BorderSizePixel = 0
                 SliderContent.Position = UDim2.new(0, 10, 0, 25)
-                SliderContent.Size = UDim2.new(1, -180, 0, 12)
+                SliderContent.Size = UDim2.new(1, -100, 0, 12)
                 SliderContent.Name = "SliderContent"
                 SliderContent.Parent = Slider
-                local lines = math.floor(SliderContent.TextBounds.X / SliderContent.AbsoluteSize.X)
-                SliderContent.Size = UDim2.new(1, -180, 0, 12 + (12 * lines))
-                SliderContent.TextWrapped = true
-                Slider.Size = UDim2.new(1, 0, 0, SliderContent.AbsoluteSize.Y + 33)
 
-                SliderContent:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-                    SliderContent.TextWrapped = false
-                    SliderContent.Size = UDim2.new(1, -180, 0, 12 + (12 * lines))
-                    Slider.Size = UDim2.new(1, 0, 0, SliderContent.AbsoluteSize.Y + 33)
-                    SliderContent.TextWrapped = true
-                    UpdateSizeSection()
-                end)
-
-                SliderInput.AnchorPoint = Vector2.new(0, 0.5)
-                SliderInput.BackgroundColor3 = GuiConfig.Color
-                SliderInput.BorderColor3 = Color3.fromRGB(0, 0, 0)
-                SliderInput.BackgroundTransparency = 1
+                -- Input box (value display + editable)
+                SliderInput.AnchorPoint = Vector2.new(1, 0)
+                SliderInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                SliderInput.BackgroundTransparency = 0.3
                 SliderInput.BorderSizePixel = 0
-                SliderInput.Position = UDim2.new(1, -155, 0.5, 0)
-                SliderInput.Size = UDim2.new(0, 28, 0, 20)
+                SliderInput.Position = UDim2.new(1, -10, 0, 10)
+                SliderInput.Size = UDim2.new(0, 70, 0, 24)
                 SliderInput.Name = "SliderInput"
                 SliderInput.Parent = Slider
 
-                UICorner16.CornerRadius = UDim.new(0, 2)
+                UICorner16.CornerRadius = UDim.new(0, 4)
                 UICorner16.Parent = SliderInput
 
                 TextBox.Font = Enum.Font.GothamBold
-                TextBox.Text = "90"
+                TextBox.Text = "0"
                 TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
                 TextBox.TextSize = 13
                 TextBox.TextWrapped = true
-                TextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-                TextBox.BackgroundTransparency = 0.9990000128746033
-                TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                TextBox.BackgroundTransparency = 1
                 TextBox.BorderSizePixel = 0
-                TextBox.Position = UDim2.new(0, -1, 0, 0)
                 TextBox.Size = UDim2.new(1, 0, 1, 0)
+                TextBox.ClearTextOnFocus = false
                 TextBox.Parent = SliderInput
 
-                SliderFrame.AnchorPoint = Vector2.new(1, 0.5)
-                SliderFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                SliderFrame.BackgroundTransparency = 0.800000011920929
-                SliderFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                -- Slider track (tinggi dinaikkan dari 4 jadi 8)
+                SliderFrame.AnchorPoint = Vector2.new(0.5, 0)
+                SliderFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                SliderFrame.BackgroundTransparency = 0.5
                 SliderFrame.BorderSizePixel = 0
-                SliderFrame.Position = UDim2.new(1, -20, 0.5, 0)
-                SliderFrame.Size = UDim2.new(0, 100, 0, 3)
+                SliderFrame.Position = UDim2.new(0.5, 0, 0, 40)
+                SliderFrame.Size = UDim2.new(1, -20, 0, 8) -- ubah dari 4 jadi 8
                 SliderFrame.Name = "SliderFrame"
                 SliderFrame.Parent = Slider
 
+                UICorner17.CornerRadius = UDim.new(0, 3) -- naikkan radius dari 2 jadi 3 biar lebih smooth
                 UICorner17.Parent = SliderFrame
 
+                -- Filled portion (hanya kotak, tanpa circle)
                 SliderDraggable.AnchorPoint = Vector2.new(0, 0.5)
-                SliderDraggable.BackgroundColor3 = GuiConfig.Color
-                SliderDraggable.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                SliderDraggable.BackgroundColor3 = GuiConfig.Color or Color3.fromRGB(100, 200, 255)
                 SliderDraggable.BorderSizePixel = 0
                 SliderDraggable.Position = UDim2.new(0, 0, 0.5, 0)
-                SliderDraggable.Size = UDim2.new(0.899999976, 0, 0, 1)
+                SliderDraggable.Size = UDim2.new(0.5, 0, 1, 0)
                 SliderDraggable.Name = "SliderDraggable"
                 SliderDraggable.Parent = SliderFrame
 
+                UICorner18.CornerRadius = UDim.new(0, 3) -- naikkan radius dari 2 jadi 3
                 UICorner18.Parent = SliderDraggable
 
-                SliderCircle.AnchorPoint = Vector2.new(1, 0.5)
-                SliderCircle.BackgroundColor3 = GuiConfig.Color
-                SliderCircle.BorderColor3 = Color3.fromRGB(0, 0, 0)
-                SliderCircle.BorderSizePixel = 0
-                SliderCircle.Position = UDim2.new(1, 4, 0.5, 0)
-                SliderCircle.Size = UDim2.new(0, 8, 0, 8)
-                SliderCircle.Name = "SliderCircle"
-                SliderCircle.Parent = SliderDraggable
+                -- Min label
+                MinLabel.Font = Enum.Font.GothamBold
+                MinLabel.Text = tostring(formatValue(SliderConfig.Min))
+                MinLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+                MinLabel.TextSize = 10
+                MinLabel.TextXAlignment = Enum.TextXAlignment.Left
+                MinLabel.BackgroundTransparency = 1
+                MinLabel.Position = UDim2.new(0, 10, 0, 52) -- turun sedikit dari 50 jadi 52 karena slider lebih tebal
+                MinLabel.Size = UDim2.new(0, 40, 0, 12)
+                MinLabel.Parent = Slider
 
-                UICorner19.Parent = SliderCircle
-
-                UIStroke6.Color = GuiConfig.Color
-                UIStroke6.Parent = SliderCircle
+                -- Max label
+                MaxLabel.Font = Enum.Font.GothamBold
+                MaxLabel.Text = tostring(formatValue(SliderConfig.Max))
+                MaxLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+                MaxLabel.TextSize = 10
+                MaxLabel.TextXAlignment = Enum.TextXAlignment.Right
+                MaxLabel.BackgroundTransparency = 1
+                MaxLabel.Position = UDim2.new(1, -50, 0, 52) -- turun sedikit dari 50 jadi 52
+                MaxLabel.Size = UDim2.new(0, 40, 0, 12)
+                MaxLabel.Parent = Slider
 
                 local Dragging = false
                 local InternalSet = false
+
                 local function Round(Number, Factor)
                     if not Factor or Factor == 0 then
                         return Number
                     end
                     local scaled = Number / Factor
-                    local roundedScaled = (math.round and math.round(scaled)) or math.floor(scaled + 0.5)
+                    local roundedScaled = math.floor(scaled + 0.5)
                     local stepped = roundedScaled * Factor
                     return formatValue(stepped)
                 end
+
                 function SliderFunc:Set(Value)
-                    local rounded = math.clamp(Round(tonumber(Value) or SliderConfig.Min, SliderConfig.Increment), SliderConfig.Min, SliderConfig.Max)
+                    local rounded = math.clamp(Round(tonumber(Value) or SliderConfig.Min, SliderConfig.Increment),
+                        SliderConfig.Min, SliderConfig.Max)
                     SliderFunc.Value = rounded
                     InternalSet = true
                     TextBox.Text = tostring(formatValue(rounded))
                     InternalSet = false
+
                     local range = SliderConfig.Max - SliderConfig.Min
                     local scale = 0
                     if range ~= 0 then
                         scale = (rounded - SliderConfig.Min) / range
                     end
-                    SliderDraggable.Size = UDim2.fromScale(math.clamp(scale, 0, 1), 1)
+
+                    -- Smooth animation untuk slider fill
+                    TweenService:Create(SliderDraggable, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {
+                        Size = UDim2.fromScale(math.clamp(scale, 0, 1), 1)
+                    }):Play()
 
                     SliderConfig.Callback(rounded)
                     ConfigData[configKey] = rounded
-                    SaveConfig()
+                    if SaveConfig then SaveConfig() end
                 end
 
                 SliderFrame.InputBegan:Connect(function(Input)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                         Dragging = true
-                        SliderCircle.Size = UDim2.new(0, 14, 0, 14)
+
                         local SizeScale = math.clamp(
                             (Input.Position.X - SliderFrame.AbsolutePosition.X) / SliderFrame.AbsoluteSize.X,
                             0,
@@ -2327,7 +2528,6 @@ function nonoya:Window(GuiConfig)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                         Dragging = false
                         SliderConfig.Callback(SliderFunc.Value)
-                        SliderCircle.Size = UDim2.new(0, 8, 0, 8)
                     end
                 end)
 
@@ -2342,16 +2542,32 @@ function nonoya:Window(GuiConfig)
                     end
                 end)
 
-                TextBox:GetPropertyChangedSignal("Text"):Connect(function()
-                    if InternalSet then
-                        return
-                    end
-                    local sanitized = TextBox.Text:gsub(",", ".")
-                    local number = tonumber(sanitized)
-                    if number ~= nil then
-                        SliderFunc:Set(number)
+                -- TextBox input dengan validasi float yang lebih baik
+                TextBox.Focused:Connect(function()
+                    TweenService:Create(SliderInput, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                        BackgroundColor3 = GuiConfig.Color or Color3.fromRGB(100, 200, 255),
+                        BackgroundTransparency = 0.7
+                    }):Play()
+                end)
+
+                TextBox.FocusLost:Connect(function()
+                    TweenService:Create(SliderInput, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                        BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+                        BackgroundTransparency = 0.3
+                    }):Play()
+
+                    if not InternalSet then
+                        local sanitized = TextBox.Text:gsub(",", ".")
+                        local number = tonumber(sanitized)
+                        if number ~= nil then
+                            SliderFunc:Set(number)
+                        else
+                            -- Reset ke value sebelumnya kalau input invalid
+                            TextBox.Text = tostring(formatValue(SliderFunc.Value))
+                        end
                     end
                 end)
+
                 SliderFunc:Set(SliderConfig.Default)
                 CountItem = CountItem + 1
                 Elements[configKey] = SliderFunc
@@ -2372,16 +2588,16 @@ function nonoya:Window(GuiConfig)
 
                 local InputFunc = { Value = InputConfig.Default }
 
-                local Input = Instance.new("Frame");
-                local UICorner12 = Instance.new("UICorner");
-                local InputTitle = Instance.new("TextLabel");
-                local InputContent = Instance.new("TextLabel");
-                local InputFrame = Instance.new("Frame");
-                local UICorner13 = Instance.new("UICorner");
-                local InputTextBox = Instance.new("TextBox");
+                local Input = Instance.new("Frame")
+                local UICorner12 = Instance.new("UICorner")
+                local InputTitle = Instance.new("TextLabel")
+                local InputContent = Instance.new("TextLabel")
+                local InputFrame = Instance.new("Frame")
+                local UICorner13 = Instance.new("UICorner")
+                local InputTextBox = Instance.new("TextBox")
 
                 Input.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                Input.BackgroundTransparency = 0.9350000023841858
+                Input.BackgroundTransparency = 0.935
                 Input.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 Input.BorderSizePixel = 0
                 Input.LayoutOrder = CountItem
@@ -2393,57 +2609,45 @@ function nonoya:Window(GuiConfig)
                 UICorner12.Parent = Input
 
                 InputTitle.Font = Enum.Font.GothamBold
-                InputTitle.Text = InputConfig.Title or "TextBox"
-                InputTitle.TextColor3 = Color3.fromRGB(230.77499270439148, 230.77499270439148, 230.77499270439148)
+                InputTitle.Text = InputConfig.Title
+                InputTitle.TextColor3 = Color3.fromRGB(230, 230, 230)
                 InputTitle.TextSize = 13
                 InputTitle.TextXAlignment = Enum.TextXAlignment.Left
                 InputTitle.TextYAlignment = Enum.TextYAlignment.Top
                 InputTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                InputTitle.BackgroundTransparency = 0.9990000128746033
+                InputTitle.BackgroundTransparency = 0.999
                 InputTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 InputTitle.BorderSizePixel = 0
                 InputTitle.Position = UDim2.new(0, 10, 0, 10)
-                InputTitle.Size = UDim2.new(1, -180, 0, 13)
+                InputTitle.Size = UDim2.new(1, -100, 0, 13)
                 InputTitle.Name = "InputTitle"
                 InputTitle.Parent = Input
 
                 InputContent.Font = Enum.Font.GothamBold
-                InputContent.Text = InputConfig.Content or "This is a TextBox"
+                InputContent.Text = InputConfig.Content
                 InputContent.TextColor3 = Color3.fromRGB(255, 255, 255)
                 InputContent.TextSize = 12
-                InputContent.TextTransparency = 0.6000000238418579
+                InputContent.TextTransparency = 0.6
                 InputContent.TextWrapped = true
                 InputContent.TextXAlignment = Enum.TextXAlignment.Left
-                InputContent.TextYAlignment = Enum.TextYAlignment.Bottom
+                InputContent.TextYAlignment = Enum.TextYAlignment.Top
                 InputContent.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                InputContent.BackgroundTransparency = 0.9990000128746033
+                InputContent.BackgroundTransparency = 0.999
                 InputContent.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 InputContent.BorderSizePixel = 0
                 InputContent.Position = UDim2.new(0, 10, 0, 25)
-                InputContent.Size = UDim2.new(1, -180, 0, 12)
+                InputContent.Size = UDim2.new(1, -100, 0, 12)
                 InputContent.Name = "InputContent"
                 InputContent.Parent = Input
-                local lines = math.floor(InputContent.TextBounds.X / InputContent.AbsoluteSize.X)
-                InputContent.Size = UDim2.new(1, -180, 0, 12 + (12 * lines))
-                InputContent.TextWrapped = true
-                Input.Size = UDim2.new(1, 0, 0, InputContent.AbsoluteSize.Y + 33)
 
-                InputContent:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-                    InputContent.TextWrapped = false
-                    InputContent.Size = UDim2.new(1, -180, 0, 12 + (12 * lines))
-                    Input.Size = UDim2.new(1, 0, 0, InputContent.AbsoluteSize.Y + 33)
-                    InputContent.TextWrapped = true
-                    UpdateSizeSection()
-                end)
-
-                InputFrame.AnchorPoint = Vector2.new(1, 0.5)
-                InputFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                InputFrame.BackgroundTransparency = 0.949999988079071
-                InputFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                -- Input frame dengan style yang sama seperti slider
+                InputFrame.AnchorPoint = Vector2.new(1, 0)
+                InputFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                InputFrame.BackgroundTransparency = 0.3
                 InputFrame.BorderSizePixel = 0
                 InputFrame.ClipsDescendants = true
-                InputFrame.Position = UDim2.new(1, -7, 0.5, 0)
-                InputFrame.Size = UDim2.new(0, 148, 0, 30)
+                InputFrame.Position = UDim2.new(1, -10, 0, 10)
+                InputFrame.Size = UDim2.new(0, 150, 0, 24)
                 InputFrame.Name = "InputFrame"
                 InputFrame.Parent = Input
 
@@ -2452,40 +2656,52 @@ function nonoya:Window(GuiConfig)
 
                 InputTextBox.CursorPosition = -1
                 InputTextBox.Font = Enum.Font.GothamBold
-                InputTextBox.PlaceholderColor3 = Color3.fromRGB(120.00000044703484, 120.00000044703484,
-                    120.00000044703484)
+                InputTextBox.PlaceholderColor3 = Color3.fromRGB(140, 140, 140)
                 InputTextBox.PlaceholderText = "Input Here"
                 InputTextBox.Text = InputConfig.Default
                 InputTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
                 InputTextBox.TextSize = 12
                 InputTextBox.TextXAlignment = Enum.TextXAlignment.Left
-                InputTextBox.AnchorPoint = Vector2.new(0, 0.5)
-                InputTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                InputTextBox.BackgroundTransparency = 0.9990000128746033
-                InputTextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                InputTextBox.BackgroundTransparency = 1
                 InputTextBox.BorderSizePixel = 0
-                InputTextBox.Position = UDim2.new(0, 5, 0.5, 0)
-                InputTextBox.Size = UDim2.new(1, -10, 1, -8)
+                InputTextBox.Position = UDim2.new(0, 8, 0, 0)
+                InputTextBox.Size = UDim2.new(1, -16, 1, 0)
+                InputTextBox.ClearTextOnFocus = false
                 InputTextBox.Name = "InputTextBox"
                 InputTextBox.Parent = InputFrame
+
                 function InputFunc:Set(Value)
-                    InputTextBox.Text = Value
+                    InputTextBox.Text = tostring(Value)
                     InputFunc.Value = Value
                     InputConfig.Callback(Value)
                     ConfigData[configKey] = Value
-                    SaveConfig()
+                    if SaveConfig then SaveConfig() end
                 end
 
                 InputFunc:Set(InputFunc.Value)
 
+                -- Animasi focus seperti slider
+                InputTextBox.Focused:Connect(function()
+                    TweenService:Create(InputFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                        BackgroundColor3 = GuiConfig.Color or Color3.fromRGB(100, 200, 255),
+                        BackgroundTransparency = 0.7
+                    }):Play()
+                end)
+
                 InputTextBox.FocusLost:Connect(function()
+                    TweenService:Create(InputFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                        BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+                        BackgroundTransparency = 0.3
+                    }):Play()
+
                     InputFunc:Set(InputTextBox.Text)
                 end)
+
                 CountItem = CountItem + 1
                 Elements[configKey] = InputFunc
                 return InputFunc
             end
-            
+
             function Items:AddDropdown(DropdownConfig)
                 local DropdownConfig = DropdownConfig or {}
                 DropdownConfig.Title = DropdownConfig.Title or "Title"
@@ -2494,6 +2710,7 @@ function nonoya:Window(GuiConfig)
                 DropdownConfig.Options = DropdownConfig.Options or {}
                 DropdownConfig.Default = DropdownConfig.Default or (DropdownConfig.Multi and {} or nil)
                 DropdownConfig.Callback = DropdownConfig.Callback or function() end
+                DropdownConfig.MaxVisibleItems = DropdownConfig.MaxVisibleItems or 5
 
                 local configKey = "Dropdown_" .. DropdownConfig.Title
                 if ConfigData[configKey] ~= nil then
@@ -2501,138 +2718,196 @@ function nonoya:Window(GuiConfig)
                 end
 
                 local DropdownFunc = { Value = DropdownConfig.Default, Options = DropdownConfig.Options }
+                local isOpen = false
 
+                -- Adjust height dengan padding yang balance
+                local hasContent = DropdownConfig.Content ~= ""
+                local headerHeight = hasContent and 72 or 56
+                local titleYPos = hasContent and 10 or 10
+                local contentYPos = 25
+                local buttonYPos = hasContent and 42 or 28
+
+                -- Container utama
                 local Dropdown = Instance.new("Frame")
-                local DropdownButton = Instance.new("TextButton")
-                local UICorner10 = Instance.new("UICorner")
-                local DropdownTitle = Instance.new("TextLabel")
-                local DropdownContent = Instance.new("TextLabel")
-                local SelectOptionsFrame = Instance.new("Frame")
-                local UICorner11 = Instance.new("UICorner")
-                local OptionSelecting = Instance.new("TextLabel")
-                local OptionArrow = Instance.new("TextLabel")
-
                 Dropdown.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 Dropdown.BackgroundTransparency = 0.935
                 Dropdown.BorderSizePixel = 0
                 Dropdown.LayoutOrder = CountItem
-                Dropdown.Size = UDim2.new(1, 0, 0, 46)
+                Dropdown.Size = UDim2.new(1, 0, 0, headerHeight)
+                Dropdown.ClipsDescendants = true
                 Dropdown.Name = "Dropdown"
                 Dropdown.Parent = SectionAdd
 
-                DropdownButton.Text = ""
-                DropdownButton.BackgroundTransparency = 1
-                DropdownButton.Size = UDim2.new(1, 0, 1, 0)
-                DropdownButton.Name = "ToggleButton"
-                DropdownButton.Parent = Dropdown
+                local UICorner = Instance.new("UICorner")
+                UICorner.CornerRadius = UDim.new(0, 4)
+                UICorner.Parent = Dropdown
 
-                UICorner10.CornerRadius = UDim.new(0, 4)
-                UICorner10.Parent = Dropdown
+                -- Header
+                local Header = Instance.new("Frame")
+                Header.BackgroundTransparency = 1
+                Header.Size = UDim2.new(1, 0, 0, headerHeight)
+                Header.Position = UDim2.new(0, 0, 0, 0)
+                Header.Name = "Header"
+                Header.Parent = Dropdown
 
+                local DropdownTitle = Instance.new("TextLabel")
                 DropdownTitle.Font = Enum.Font.GothamBold
                 DropdownTitle.Text = DropdownConfig.Title
                 DropdownTitle.TextColor3 = Color3.fromRGB(230, 230, 230)
                 DropdownTitle.TextSize = 13
                 DropdownTitle.TextXAlignment = Enum.TextXAlignment.Left
                 DropdownTitle.BackgroundTransparency = 1
-                DropdownTitle.Position = UDim2.new(0, 10, 0, 10)
-                DropdownTitle.Size = UDim2.new(1, -180, 0, 13)
+                DropdownTitle.Position = UDim2.new(0, 10, 0, titleYPos)
+                DropdownTitle.Size = UDim2.new(1, -20, 0, 13)
                 DropdownTitle.Name = "DropdownTitle"
-                DropdownTitle.Parent = Dropdown
+                DropdownTitle.Parent = Header
 
-                DropdownContent.Font = Enum.Font.GothamBold
-                DropdownContent.Text = DropdownConfig.Content
-                DropdownContent.TextColor3 = Color3.fromRGB(255, 255, 255)
-                DropdownContent.TextSize = 12
-                DropdownContent.TextTransparency = 0.6
-                DropdownContent.TextWrapped = true
-                DropdownContent.TextXAlignment = Enum.TextXAlignment.Left
-                DropdownContent.BackgroundTransparency = 1
-                DropdownContent.Position = UDim2.new(0, 10, 0, 25)
-                DropdownContent.Size = UDim2.new(1, -180, 0, 12)
-                DropdownContent.Name = "DropdownContent"
-                DropdownContent.Parent = Dropdown
+                -- Content label (hanya muncul kalau ada content)
+                local DropdownContent
+                if hasContent then
+                    DropdownContent = Instance.new("TextLabel")
+                    DropdownContent.Font = Enum.Font.GothamBold
+                    DropdownContent.Text = DropdownConfig.Content
+                    DropdownContent.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    DropdownContent.TextSize = 12
+                    DropdownContent.TextTransparency = 0.6
+                    DropdownContent.TextWrapped = true
+                    DropdownContent.TextXAlignment = Enum.TextXAlignment.Left
+                    DropdownContent.BackgroundTransparency = 1
+                    DropdownContent.Position = UDim2.new(0, 10, 0, contentYPos)
+                    DropdownContent.Size = UDim2.new(1, -20, 0, 12)
+                    DropdownContent.Name = "DropdownContent"
+                    DropdownContent.Parent = Header
+                end
 
-                SelectOptionsFrame.AnchorPoint = Vector2.new(1, 0.5)
+                -- Tombol full width di bawah
+                local SelectOptionsFrame = Instance.new("TextButton")
                 SelectOptionsFrame.BackgroundTransparency = 0.95
-                SelectOptionsFrame.Position = UDim2.new(1, -7, 0.5, 0)
-                SelectOptionsFrame.Size = UDim2.new(0, 148, 0, 30)
+                SelectOptionsFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                SelectOptionsFrame.Position = UDim2.new(0, 10, 0, buttonYPos)
+                SelectOptionsFrame.Size = UDim2.new(1, -20, 0, 24)
+                SelectOptionsFrame.Text = ""
                 SelectOptionsFrame.Name = "SelectOptionsFrame"
-                SelectOptionsFrame.Parent = Dropdown
+                SelectOptionsFrame.Parent = Header
 
-                UICorner11.CornerRadius = UDim.new(0, 4)
-                UICorner11.Parent = SelectOptionsFrame
+                local UICorner2 = Instance.new("UICorner")
+                UICorner2.CornerRadius = UDim.new(0, 4)
+                UICorner2.Parent = SelectOptionsFrame
 
-
+                local OptionSelecting = Instance.new("TextLabel")
                 OptionSelecting.Font = Enum.Font.GothamBold
                 OptionSelecting.Text = DropdownConfig.Multi and "Select Options" or "Select Option"
                 OptionSelecting.TextColor3 = Color3.fromRGB(255, 255, 255)
                 OptionSelecting.TextSize = 12
                 OptionSelecting.TextTransparency = 0.6
                 OptionSelecting.TextXAlignment = Enum.TextXAlignment.Left
-                OptionSelecting.AnchorPoint = Vector2.new(0, 0.5)
                 OptionSelecting.BackgroundTransparency = 1
-                OptionSelecting.Position = UDim2.new(0, 5, 0.5, 0)
-                OptionSelecting.Size = UDim2.new(1, -30, 1, -8)
+                OptionSelecting.Position = UDim2.new(0, 8, 0, 0)
+                OptionSelecting.Size = UDim2.new(1, -30, 1, 0)
                 OptionSelecting.Name = "OptionSelecting"
                 OptionSelecting.Parent = SelectOptionsFrame
 
+                local OptionArrow = Instance.new("TextLabel")
                 OptionArrow.Font = Enum.Font.GothamBold
                 OptionArrow.Text = ">"
-                OptionArrow.TextColor3 = defaultArrowColor
+                OptionArrow.TextColor3 = defaultArrowColor or Color3.fromRGB(255, 255, 255)
                 OptionArrow.TextSize = 16
                 OptionArrow.AnchorPoint = Vector2.new(1, 0.5)
                 OptionArrow.BackgroundTransparency = 1
-                OptionArrow.Position = UDim2.new(1, -2, 0.5, 0)
+                OptionArrow.Position = UDim2.new(1, -5, 0.5, 0)
                 OptionArrow.Size = UDim2.new(0, 18, 0, 18)
                 OptionArrow.Name = "OptionArrow"
                 OptionArrow.Parent = SelectOptionsFrame
 
-                local DropdownContainer = Instance.new("Frame")
-                DropdownContainer.Size = UDim2.new(1, 0, 1, 0)
-                DropdownContainer.BackgroundTransparency = 1
-                DropdownContainer.Visible = false
-                DropdownContainer.Parent = DropdownFolder
+                -- Dropdown list container
+                local ExpandContainer = Instance.new("Frame")
+                ExpandContainer.BackgroundTransparency = 1
+                ExpandContainer.Position = UDim2.new(0, 0, 0, headerHeight + 3)
+                ExpandContainer.Size = UDim2.new(1, 0, 0, 0)
+                ExpandContainer.Name = "ExpandContainer"
+                ExpandContainer.Parent = Dropdown
 
-                DropdownButton.Activated:Connect(function()
-                    openDropdownOverlay(DropdownContainer, OptionArrow)
-                end)
-
+                -- Search box dengan padding yang lebih kecil
                 local SearchBox = Instance.new("TextBox")
                 SearchBox.PlaceholderText = "Search"
-                SearchBox.Font = Enum.Font.Gotham
+                SearchBox.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
+                SearchBox.Font = Enum.Font.GothamBold
                 SearchBox.Text = ""
                 SearchBox.TextSize = 12
                 SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-                SearchBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-                SearchBox.BackgroundTransparency = 0.9
+                SearchBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                SearchBox.BackgroundTransparency = 0.3
                 SearchBox.BorderSizePixel = 0
-                SearchBox.Size = UDim2.new(1, 0, 0, 25)
-                SearchBox.Position = UDim2.new(0, 0, 0, 0)
-                SearchBox.ClearTextOnFocus = false
+                SearchBox.Size = UDim2.new(1, -20, 0, 26)
+                SearchBox.Position = UDim2.new(0, 10, 0, 3)
+                SearchBox.ClearTextOnFocus = true
                 SearchBox.Name = "SearchBox"
-                SearchBox.Parent = DropdownContainer
+                SearchBox.Parent = ExpandContainer
 
+                local SearchCorner = Instance.new("UICorner")
+                SearchCorner.CornerRadius = UDim.new(0, 4)
+                SearchCorner.Parent = SearchBox
+
+                -- Scroll untuk options
                 local ScrollSelect = Instance.new("ScrollingFrame")
-                ScrollSelect.Size = UDim2.new(1, 0, 1, -30)
-                ScrollSelect.Position = UDim2.new(0, 0, 0, 30)
-                ScrollSelect.ScrollBarImageTransparency = 1
+                ScrollSelect.Size = UDim2.new(1, -20, 1, -34)
+                ScrollSelect.Position = UDim2.new(0, 10, 0, 32)
+                ScrollSelect.ScrollBarImageTransparency = 0.7
                 ScrollSelect.BorderSizePixel = 0
                 ScrollSelect.BackgroundTransparency = 1
-                ScrollSelect.ScrollBarThickness = 0
+                ScrollSelect.ScrollBarThickness = 4
                 ScrollSelect.CanvasSize = UDim2.new(0, 0, 0, 0)
                 ScrollSelect.Name = "ScrollSelect"
-                ScrollSelect.Parent = DropdownContainer
+                ScrollSelect.Parent = ExpandContainer
 
-                local UIListLayout4 = Instance.new("UIListLayout")
-                UIListLayout4.Padding = UDim.new(0, 3)
-                UIListLayout4.SortOrder = Enum.SortOrder.LayoutOrder
-                UIListLayout4.Parent = ScrollSelect
+                local UIListLayout = Instance.new("UIListLayout")
+                UIListLayout.Padding = UDim.new(0, 2)
+                UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                UIListLayout.Parent = ScrollSelect
 
-                UIListLayout4:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-                    ScrollSelect.CanvasSize = UDim2.new(0, 0, 0, UIListLayout4.AbsoluteContentSize.Y)
+                UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                    ScrollSelect.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y)
                 end)
 
+                -- Toggle expand/collapse
+                local function toggleDropdown()
+                    isOpen = not isOpen
+
+                    local targetHeight
+                    local arrowRotation
+
+                    if isOpen then
+                        local itemCount = math.min(#DropdownFunc.Options, DropdownConfig.MaxVisibleItems)
+                        local dropHeight = 38 + (itemCount * 30)
+                        targetHeight = UDim2.new(1, 0, 0, headerHeight + dropHeight)
+                        arrowRotation = 90
+
+                        TweenService:Create(ExpandContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                            Size = UDim2.new(1, 0, 0, dropHeight)
+                        }):Play()
+                    else
+                        targetHeight = UDim2.new(1, 0, 0, headerHeight)
+                        arrowRotation = 0
+
+                        TweenService:Create(ExpandContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                            Size = UDim2.new(1, 0, 0, 0)
+                        }):Play()
+
+                        SearchBox.Text = ""
+                    end
+
+                    TweenService:Create(Dropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                        Size = targetHeight
+                    }):Play()
+
+                    TweenService:Create(OptionArrow, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                        Rotation = arrowRotation
+                    }):Play()
+                end
+
+                SelectOptionsFrame.Activated:Connect(toggleDropdown)
+
+                -- Search functionality
                 SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
                     local query = string.lower(SearchBox.Text)
                     for _, option in pairs(ScrollSelect:GetChildren()) do
@@ -2641,10 +2916,22 @@ function nonoya:Window(GuiConfig)
                             option.Visible = query == "" or string.find(text, query, 1, true)
                         end
                     end
-                    ScrollSelect.CanvasSize = UDim2.new(0, 0, 0, UIListLayout4.AbsoluteContentSize.Y)
                 end)
 
-                local DropCount = 0
+                -- Animasi focus/unfocus seperti input lainnya
+                SearchBox.Focused:Connect(function()
+                    TweenService:Create(SearchBox, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                        BackgroundColor3 = GuiConfig.Color or Color3.fromRGB(100, 200, 255),
+                        BackgroundTransparency = 0.7
+                    }):Play()
+                end)
+
+                SearchBox.FocusLost:Connect(function()
+                    TweenService:Create(SearchBox, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+                        BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+                        BackgroundTransparency = 0.3
+                    }):Play()
+                end)
 
                 function DropdownFunc:Clear()
                     for _, DropFrame in ScrollSelect:GetChildren() do
@@ -2655,7 +2942,6 @@ function nonoya:Window(GuiConfig)
                     DropdownFunc.Value = DropdownConfig.Multi and {} or nil
                     DropdownFunc.Options = {}
                     OptionSelecting.Text = DropdownConfig.Multi and "Select Options" or "Select Option"
-                    DropCount = 0
                 end
 
                 function DropdownFunc:AddOption(option)
@@ -2669,33 +2955,29 @@ function nonoya:Window(GuiConfig)
                     end
 
                     local Option = Instance.new("Frame")
-                    local OptionButton = Instance.new("TextButton")
-                    local OptionText = Instance.new("TextLabel")
-                    local ChooseFrame = Instance.new("Frame")
-                    local UIStroke15 = Instance.new("UIStroke")
-                    local UICorner38 = Instance.new("UICorner")
-                    local UICorner37 = Instance.new("UICorner")
-
-                    Option.BackgroundTransparency = 1
-                    Option.Size = UDim2.new(1, 0, 0, 30)
+                    Option.BackgroundTransparency = 0.99
+                    Option.Size = UDim2.new(1, 0, 0, 28)
                     Option.Name = "Option"
                     Option.Parent = ScrollSelect
 
-                    UICorner37.CornerRadius = UDim.new(0, 3)
-                    UICorner37.Parent = Option
+                    local UICorner = Instance.new("UICorner")
+                    UICorner.CornerRadius = UDim.new(0, 3)
+                    UICorner.Parent = Option
 
+                    local OptionButton = Instance.new("TextButton")
                     OptionButton.BackgroundTransparency = 1
                     OptionButton.Size = UDim2.new(1, 0, 1, 0)
                     OptionButton.Text = ""
                     OptionButton.Name = "OptionButton"
                     OptionButton.Parent = Option
 
+                    local OptionText = Instance.new("TextLabel")
                     OptionText.Font = Enum.Font.GothamBold
                     OptionText.Text = label
-                    OptionText.TextSize = 13
+                    OptionText.TextSize = 12
                     OptionText.TextColor3 = Color3.fromRGB(230, 230, 230)
-                    OptionText.Position = UDim2.new(0, 8, 0, 8)
-                    OptionText.Size = UDim2.new(1, -100, 0, 13)
+                    OptionText.Position = UDim2.new(0, 8, 0, 7)
+                    OptionText.Size = UDim2.new(1, -20, 0, 14)
                     OptionText.BackgroundTransparency = 1
                     OptionText.TextXAlignment = Enum.TextXAlignment.Left
                     OptionText.Name = "OptionText"
@@ -2703,18 +2985,22 @@ function nonoya:Window(GuiConfig)
 
                     Option:SetAttribute("RealValue", value)
 
+                    local ChooseFrame = Instance.new("Frame")
                     ChooseFrame.AnchorPoint = Vector2.new(0, 0.5)
-                    ChooseFrame.BackgroundColor3 = GuiConfig.Color
+                    ChooseFrame.BackgroundColor3 = GuiConfig.Color or Color3.fromRGB(100, 200, 255)
                     ChooseFrame.Position = UDim2.new(0, 2, 0.5, 0)
                     ChooseFrame.Size = UDim2.new(0, 0, 0, 0)
                     ChooseFrame.Name = "ChooseFrame"
                     ChooseFrame.Parent = Option
 
-                    UIStroke15.Color = GuiConfig.Color
-                    UIStroke15.Thickness = 1.6
-                    UIStroke15.Transparency = 0.999
-                    UIStroke15.Parent = ChooseFrame
-                    UICorner38.Parent = ChooseFrame
+                    local UIStroke = Instance.new("UIStroke")
+                    UIStroke.Color = GuiConfig.Color or Color3.fromRGB(100, 200, 255)
+                    UIStroke.Thickness = 1.6
+                    UIStroke.Transparency = 0.999
+                    UIStroke.Parent = ChooseFrame
+
+                    local ChooseCorner = Instance.new("UICorner")
+                    ChooseCorner.Parent = ChooseFrame
 
                     OptionButton.Activated:Connect(function()
                         if DropdownConfig.Multi then
@@ -2743,9 +3029,10 @@ function nonoya:Window(GuiConfig)
                     end
 
                     ConfigData[configKey] = DropdownFunc.Value
-                    SaveConfig()
-                    if not DropdownConfig.Multi then
-                        closeDropdownOverlay()
+                    if SaveConfig then SaveConfig() end
+
+                    if not DropdownConfig.Multi and isOpen then
+                        toggleDropdown()
                     end
 
                     local texts = {}
@@ -2880,3 +3167,4 @@ nonoya.SetConfigName = SetConfigName
 nonoya.GetCurrentConfigName = GetCurrentConfigName
 
 return nonoya
+
